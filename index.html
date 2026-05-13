@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Pri Arena | Best Streamer & Sister-From-Another-Mister</title>
+    
+    <!-- Core Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --pink: #ff85c0;
+            --lavender: #e0b0ff;
+            --purple: #9d4edd;
+            --gold: #ffd700;
+            --bg-dark: #0a0510;
+        }
+        
+        body {
+            background-color: var(--bg-dark);
+            color: #ffffff;
+            font-family: 'Outfit', sans-serif;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .handwritten { font-family: 'Dancing Script', cursive; }
+        
+        /* Premium UI Elements */
+        .glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .glowing-text {
+            text-shadow: 0 0 15px var(--pink), 0 0 30px var(--purple);
+        }
+        
+        .gold-glow {
+            text-shadow: 0 0 10px var(--gold), 0 0 20px var(--gold);
+        }
+
+        /* Particles & Animations */
+        .floating { animation: float 6s ease-in-out infinite; }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .pulse-border {
+            box-shadow: 0 0 0 0 rgba(255, 133, 192, 0.7);
+            animation: pulsing 2s infinite;
+        }
+        @keyframes pulsing {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 133, 192, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 15px rgba(255, 133, 192, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 133, 192, 0); }
+        }
+
+        /* Polaroid & Tilt Effects */
+        .polaroid {
+            background: white;
+            padding: 12px 12px 40px 12px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+            transition: transform 0.1s ease;
+            transform-style: preserve-3d;
+        }
+        .polaroid img { pointer-events: none; }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: var(--pink); border-radius: 10px; }
+
+        /* Music Visualizer */
+        .bar {
+            width: 4px;
+            background: var(--pink);
+            border-radius: 2px;
+            animation: equalize 1s infinite alternate ease-in-out;
+        }
+        @keyframes equalize { 0% { height: 10px; } 100% { height: 35px; } }
+        
+        /* Chat Box */
+        .chat-message {
+            animation: slideIn 0.4s ease-out forwards;
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        @keyframes slideIn { to { opacity: 1; transform: translateX(0); } }
+
+        /* Fullscreen Crossfade */
+        .crossfade img {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;
+            opacity: 0; transition: opacity 2s ease-in-out;
+        }
+        .crossfade img.active { opacity: 1; }
+    </style>
+</head>
+<body>
+
+    <!-- 0. LOADING SCREEN -->
+    <div id="loader" class="fixed inset-0 z-[999] bg-[#0a0510] flex flex-col items-center justify-center">
+        <h1 class="text-4xl md:text-6xl handwritten glowing-text mb-8">Loading Magic for Pri Arena...</h1>
+        <div class="w-64 h-1 bg-white/10 rounded-full overflow-hidden">
+            <div id="loading-bar" class="h-full bg-gradient-to-r from-[--pink] to-[--purple] w-0"></div>
+        </div>
+    </div>
+
+    <!-- FLOATING MUSIC PLAYER -->
+    <div class="fixed top-6 right-6 z-50 glass p-3 rounded-2xl flex flex-col items-center gap-3 w-48 transition-all hover:bg-white/10 group">
+        <div class="flex w-full items-center justify-between">
+            <div class="text-[10px] text-pink-300 uppercase tracking-widest font-bold">Vibes Player</div>
+            <div id="visualizer" class="hidden flex items-end gap-1 h-6">
+                <div class="bar" style="animation-delay: 0.1s"></div>
+                <div class="bar" style="animation-delay: 0.3s"></div>
+                <div class="bar" style="animation-delay: 0.0s"></div>
+                <div class="bar" style="animation-delay: 0.2s"></div>
+            </div>
+        </div>
+        <div class="text-xs text-gray-300 truncate w-full text-center" id="track-name">'Golden Hour' Lofi Remix</div>
+        <div class="flex items-center gap-4">
+            <button onclick="prevTrack()" class="hover:text-pink-400 transition">⏮</button>
+            <button onclick="toggleMusic()" id="play-btn" class="w-10 h-10 rounded-full bg-gradient-to-r from-[--pink] to-[--purple] flex items-center justify-center hover:scale-110 transition shadow-[0_0_15px_var(--pink)]">▶</button>
+            <button onclick="nextTrack()" class="hover:text-pink-400 transition">⏭</button>
+        </div>
+        <input type="range" id="volume-slider" min="0" max="1" step="0.1" value="0.5" class="w-full h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer">
+    </div>
+
+    <!-- 1. INTRO PAGE -->
+    <section class="min-h-screen relative flex items-center justify-center overflow-hidden">
+        <!-- Cinematic Background -->
+        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1534142498516-17b2f026027a?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-20 mix-blend-screen"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-[#0a0510]/80 to-[#0a0510]"></div>
+        
+        <div class="z-10 text-center px-4 flex flex-col items-center">
+            <h1 class="text-6xl md:text-9xl handwritten glowing-text mb-4 floating">Happy Birthday Pri Arena 🎂</h1>
+            <h2 class="text-xl md:text-3xl font-light text-gray-200 mt-4 mb-12 max-w-3xl leading-relaxed">
+                To the Best Streamer, My Best Friend & The Sister I Chose ❤️
+            </h2>
+            <button onclick="document.getElementById('friend-sister').scrollIntoView()" class="relative px-10 py-4 bg-transparent overflow-hidden rounded-full border border-pink-500/50 transition-all hover:border-pink-500 hover:shadow-[0_0_30px_rgba(255,133,192,0.5)] group">
+                <div class="absolute inset-0 bg-gradient-to-r from-[--pink] to-[--purple] opacity-0 group-hover:opacity-30 transition-opacity"></div>
+                <span class="relative uppercase tracking-[0.2em] text-sm font-bold text-white">Enter the Surprise ↓</span>
+            </button>
+        </div>
+    </section>
+
+    <!-- 2. FRIEND & SISTER PAGE -->
+    <section id="friend-sister" class="min-h-screen flex items-center justify-center py-20 px-6 relative gs-reveal">
+        <div class="max-w-6xl w-full grid md:grid-cols-2 gap-16 items-center">
+            <div class="order-2 md:order-1">
+                <h2 class="text-4xl md:text-6xl font-bold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-[--pink] to-[--lavender]">The friend who became family ❤️</h2>
+                <div class="w-24 h-1 bg-pink-500 mb-8 rounded-full"></div>
+                <p class="text-xl text-gray-300 leading-relaxed mb-6 font-light">
+                    Some people are born with sisters, and some are lucky enough to find them in friends. From the moment we clicked, you've been my biggest supporter, my guide, and my constant inspiration. Before the world saw your spark on stream, I already knew you were a star.
+                </p>
+            </div>
+            <div class="order-1 md:order-2 relative tilt-card cursor-pointer">
+                <div class="absolute inset-0 bg-gradient-to-tr from-[--pink] to-[--purple] rounded-3xl transform rotate-3 scale-105 opacity-40 blur-xl"></div>
+                <!-- Portrait Placeholder -->
+                <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?q=80&w=1887&auto=format&fit=crop" class="relative rounded-3xl w-full object-cover h-[600px] border border-white/10" alt="Pri Arena Portrait">
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. STREAMER ACHIEVEMENT PAGE -->
+    <section class="min-h-screen py-20 px-4 flex flex-col items-center bg-[#050208] relative border-y border-white/5 gs-reveal">
+        <div class="absolute top-10 left-10 text-pink-500/20 text-9xl font-bold italic z-0 pointer-events-none">361</div>
+        
+        <div class="z-10 text-center mb-12">
+            <span class="px-4 py-1 border border-purple-500/50 rounded-full text-purple-300 uppercase tracking-widest text-xs mb-4 inline-block bg-purple-500/10">Level Up Unlocked 🎮</span>
+            <h2 class="text-5xl font-bold mb-4">Congratulations on <span class="glowing-text">361 Subscribers</span> 🚀</h2>
+            <p class="text-gray-400 text-xl">Building an amazing community, one stream at a time.</p>
+        </div>
+
+        <div class="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-3 gap-8 z-10">
+            <!-- Setup & Counter -->
+            <div class="lg:col-span-2 glass rounded-3xl p-8 relative overflow-hidden flex flex-col items-center justify-center group bg-[url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center">
+                <div class="absolute inset-0 bg-black/70 group-hover:bg-black/50 transition-all duration-700"></div>
+                <div class="relative z-10 text-center">
+                    <div class="w-32 h-32 mx-auto rounded-full pulse-border bg-black/50 backdrop-blur-md flex items-center justify-center border-2 border-pink-500 mb-6">
+                        <span class="text-4xl">👑</span>
+                    </div>
+                    <div class="text-2xl uppercase tracking-widest text-pink-300 mb-2 font-bold">BEST STREAMER</div>
+                    <!-- Counter Element -->
+                    <div id="sub-counter" class="text-7xl md:text-9xl font-bold gold-glow">0</div>
+                    <div class="text-xl text-gray-300 mt-2 uppercase tracking-wider">Subscribers</div>
+                </div>
+            </div>
+
+            <!-- Fake Live Chat -->
+            <div class="glass rounded-3xl p-6 flex flex-col h-[500px]">
+                <div class="flex items-center gap-2 border-b border-white/10 pb-4 mb-4">
+                    <span class="w-3 h-3 bg-red-500 rounded-full animate-pulse"></span>
+                    <h3 class="font-bold text-lg">Live Chat Replay</h3>
+                </div>
+                <div id="chat-box" class="flex-1 overflow-y-auto flex flex-col gap-4 pr-2"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. MEMORY GALLERY -->
+    <section class="py-32 px-6 bg-[#0a0510]">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-5xl font-bold mb-16 text-center gs-reveal">The Scrapbook 📸</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Polaroid 1 -->
+                <div class="polaroid tilt-card rotate-[-2deg] gs-reveal cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1511895426328-dc8714191300?q=80&w=2070&auto=format&fit=crop" class="w-full h-64 object-cover">
+                    <p class="text-black handwritten text-center mt-4 text-2xl">My Best Friend ❤️</p>
+                </div>
+                <!-- Polaroid 2 -->
+                <div class="polaroid tilt-card rotate-[3deg] lg:mt-12 gs-reveal cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1561089489-f13d5e730d72?q=80&w=1974&auto=format&fit=crop" class="w-full h-64 object-cover">
+                    <p class="text-black handwritten text-center mt-4 text-2xl">Streamer Queen 👑</p>
+                </div>
+                <!-- Polaroid 3 -->
+                <div class="polaroid tilt-card rotate-[-4deg] gs-reveal cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1887&auto=format&fit=crop" class="w-full h-64 object-cover">
+                    <p class="text-black handwritten text-center mt-4 text-2xl">361 Strong & Growing 🚀</p>
+                </div>
+                <!-- Polaroid 4 -->
+                <div class="polaroid tilt-card rotate-[2deg] lg:mt-12 gs-reveal cursor-pointer">
+                    <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=1887&auto=format&fit=crop" class="w-full h-64 object-cover">
+                    <p class="text-black handwritten text-center mt-4 text-2xl">Proud of You Always ✨</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. MEMORIES TIMELINE -->
+    <section class="py-24 px-6 bg-[#0d0714] relative">
+        <div class="max-w-4xl mx-auto relative gs-reveal">
+            <h2 class="text-5xl font-bold mb-16 text-center text-[--pink]">Our Epic Timeline</h2>
+            
+            <div class="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-[--pink] to-[--purple] rounded-full opacity-30"></div>
+
+            <div class="flex items-center justify-between mb-16 relative">
+                <div class="w-5/12 text-right pr-8 glass p-6 rounded-2xl">
+                    <h3 class="text-2xl font-bold text-pink-300">The Beginning</h3>
+                    <p class="text-gray-300 mt-2 text-sm">From the very first day we hung out to staying up way too late chatting about our dreams. We just knew we were meant to be friends.</p>
+                </div>
+                <div class="w-6 h-6 bg-[--pink] rounded-full absolute left-1/2 transform -translate-x-1/2 border-4 border-[#0d0714] z-10 shadow-[0_0_15px_var(--pink)]"></div>
+                <div class="w-5/12 pl-8 opacity-0">Spacer</div>
+            </div>
+
+            <div class="flex items-center justify-between mb-16 relative">
+                <div class="w-5/12 pr-8 opacity-0">Spacer</div>
+                <div class="w-6 h-6 bg-[--purple] rounded-full absolute left-1/2 transform -translate-x-1/2 border-4 border-[#0d0714] z-10 shadow-[0_0_15px_var(--purple)]"></div>
+                <div class="w-5/12 pl-8 glass p-6 rounded-2xl">
+                    <h3 class="text-2xl font-bold text-purple-300">Unstoppable Duo</h3>
+                    <p class="text-gray-300 mt-2 text-sm">Always having each other's backs, countless inside jokes, and watching you crush your streamer goals. You're simply the best.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. MUSIC & VIBES PAGE -->
+    <section class="min-h-screen py-20 flex flex-col justify-center items-center relative overflow-hidden bg-[#050208] gs-reveal">
+        <div class="absolute inset-0 bg-gradient-to-r from-pink-900/10 to-purple-900/10"></div>
+        <div class="text-center z-10 mb-12">
+            <h2 class="text-5xl font-bold mb-4">Your Birthday Soundtrack 🎧</h2>
+            <p class="text-gray-400">Because every main character needs theme music.</p>
+        </div>
+        
+        <div class="glass p-8 md:p-12 rounded-3xl w-full max-w-2xl z-10 flex flex-col items-center">
+            <div class="w-48 h-48 rounded-full border-4 border-[--pink] overflow-hidden mb-8 shadow-[0_0_30px_rgba(255,133,192,0.4)] animate-[spin_10s_linear_infinite]" id="record">
+                <img src="https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=2070&auto=format&fit=crop" class="w-full h-full object-cover">
+            </div>
+            <h3 class="text-3xl font-bold mb-2">Golden Hour Remix</h3>
+            <p class="text-pink-400 mb-8 tracking-widest uppercase text-sm">Now Playing</p>
+            
+            <div id="large-visualizer" class="flex items-end gap-2 h-16 w-full justify-center mb-8">
+                <!-- Script will populate these -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 7. FUN INTERACTIVE PAGE -->
+    <section class="py-32 px-6 bg-[#0a0510] text-center relative overflow-hidden gs-reveal">
+        <h2 class="text-5xl font-bold mb-6">Friendship Control Panel 🎛️</h2>
+        <p class="text-gray-400 mb-16 max-w-2xl mx-auto">As your friend and unofficial sibling, it is my sworn duty to push buttons. Feel free to push these.</p>
+        
+        <div class="flex flex-wrap justify-center gap-6 z-10 relative">
+            <button onclick="popHeart()" class="glass px-8 py-5 rounded-2xl hover:bg-pink-500/20 transition border border-pink-500/30 text-xl font-bold flex items-center gap-3 hover:-translate-y-2">
+                <span>💖</span> Heart Explosion
+            </button>
+            <button onclick="popConfetti()" class="glass px-8 py-5 rounded-2xl hover:bg-purple-500/20 transition border border-purple-500/30 text-xl font-bold flex items-center gap-3 hover:-translate-y-2">
+                <span>🎉</span> Mini Celebration
+            </button>
+            <button onclick="alert('Hidden Message: You are truly one of a kind. Never change who you are. Happy Birthday! ❤️')" class="glass px-8 py-5 rounded-2xl hover:bg-white/10 transition border border-white/20 text-xl font-bold flex items-center gap-3 hover:-translate-y-2">
+                <span>🎁</span> Secret Message
+            </button>
+        </div>
+    </section>
+
+    <!-- 8. LETTER TO YOU -->
+    <section class="min-h-screen py-20 flex items-center justify-center bg-[url('https://images.unsplash.com/photo-1518621736915-f3b1c41bfd00?q=80&w=2093&auto=format&fit=crop')] bg-cover bg-center relative bg-fixed">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+        <div class="max-w-3xl glass p-10 md:p-16 rounded-3xl z-10 gs-reveal relative">
+            <div class="absolute -top-8 -left-8 text-6xl opacity-50">❝</div>
+            <div class="absolute -bottom-8 -right-8 text-6xl opacity-50">❞</div>
+            
+            <h2 class="text-4xl font-bold mb-8 text-center text-transparent bg-clip-text bg-gradient-to-r from-[--pink] to-[--gold]">A Letter to You</h2>
+            
+            <div class="handwritten text-2xl md:text-4xl leading-relaxed text-gray-200" id="typewriter-text">
+                <!-- Text typed by JS -->
+            </div>
+            
+            <p class="handwritten text-3xl text-pink-400 mt-10 text-right opacity-0" id="letter-sign">- Your Best Friend aka Sibling</p>
+        </div>
+    </section>
+
+    <!-- 9. FINAL SURPRISE PAGE (CROSSFADE MONTAGE) -->
+    <section class="h-screen relative overflow-hidden flex items-center justify-center bg-black gs-reveal">
+        <div class="absolute inset-0 crossfade z-0" id="montage">
+            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1887&auto=format&fit=crop" class="active">
+            <img src="https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?q=80&w=1887&auto=format&fit=crop">
+            <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=1887&auto=format&fit=crop">
+        </div>
+        <div class="absolute inset-0 bg-black/60 z-10"></div>
+        
+        <div class="z-20 text-center px-4 max-w-4xl">
+            <h2 class="text-3xl md:text-6xl font-light leading-snug tracking-wide italic">
+                "No matter how famous you become... <br>
+                <span class="text-pink-400 font-bold not-italic mt-4 block">you'll always be my friend and sister first ❤️"</span>
+            </h2>
+        </div>
+    </section>
+
+    <!-- 10. GRAND FINALE -->
+    <section class="min-h-screen flex flex-col items-center justify-center text-center p-6 bg-gradient-to-t from-black to-[#0a0510] relative overflow-hidden">
+        <div class="z-10 w-full max-w-4xl flex flex-col items-center">
+            <h1 class="text-6xl md:text-8xl font-bold mb-4 handwritten glowing-text">HAPPY BIRTHDAY PRI ARENA 🎂</h1>
+            <p class="text-2xl text-gray-400 mb-16 uppercase tracking-widest font-light">Make a wish!</p>
+            
+            <div id="cake-wrapper" class="relative cursor-pointer group mb-12 transform transition-transform hover:scale-110" onclick="grandFinale()">
+                <div class="text-[150px] md:text-[200px] floating drop-shadow-[0_0_30px_rgba(255,215,0,0.5)]">🎂</div>
+                <div class="absolute -bottom-4 left-1/2 transform -translate-x-1/2 bg-[--pink] text-white px-8 py-3 rounded-full font-bold text-lg shadow-[0_0_20px_var(--pink)] whitespace-nowrap z-20 pulse-border">
+                    CUT THE CAKE 🎉
+                </div>
+            </div>
+
+            <div id="final-cheer" class="opacity-0 transform translate-y-8 transition-all duration-1000 mt-8">
+                <p class="text-3xl font-light text-white">Let the celebration begin! Have the best day ever!</p>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // --- 1. SETUP & LOADER ---
+        window.onload = () => {
+            gsap.to("#loading-bar", { width: "100%", duration: 2, ease: "power2.inOut", onComplete: () => {
+                gsap.to("#loader", { opacity: 0, duration: 1, onComplete: () => {
+                    document.getElementById('loader').style.display = 'none';
+                    initGSAP();
+                    initTilt();
+                    startChat();
+                    startMontage();
+                    generateLargeVisualizer();
+                }});
+            }});
+        };
+
+        function initGSAP() {
+            gsap.registerPlugin(ScrollTrigger);
+            
+            // Standard reveals
+            gsap.utils.toArray('.gs-reveal').forEach(elem => {
+                gsap.from(elem, {
+                    scrollTrigger: { trigger: elem, start: "top 80%" },
+                    y: 60, opacity: 0, duration: 1.2, ease: "power3.out"
+                });
+            });
+
+            // 361 Counter Animation
+            ScrollTrigger.create({
+                trigger: "#sub-counter",
+                start: "top 85%",
+                once: true,
+                onEnter: () => {
+                    let counter = { val: 0 };
+                    gsap.to(counter, {
+                        val: 361, duration: 3, ease: "power2.out",
+                        onUpdate: () => { document.getElementById("sub-counter").innerHTML = Math.floor(counter.val).toLocaleString(); }
+                    });
+                }
+            });
+
+            // Typewriter Letter trigger
+            ScrollTrigger.create({
+                trigger: "#typewriter-text",
+                start: "top 75%",
+                once: true,
+                onEnter: () => typeLetter()
+            });
+        }
+
+        // --- 2. 3D TILT EFFECT ---
+        function initTilt() {
+            const cards = document.querySelectorAll('.tilt-card');
+            cards.forEach(card => {
+                card.addEventListener('mousemove', e => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    const rotateX = ((y - centerY) / centerY) * -15;
+                    const rotateY = ((x - centerX) / centerX) * 15;
+                    
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`;
+                });
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+                });
+            });
+        }
+
+        // --- 3. MUSIC CONTROLS ---
+        const tracks = [
+            { name: "Golden Hour (Soft Lofi)", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-15.mp3" },
+            { name: "Emotional Cinema", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-16.mp3" },
+            { name: "Celebration Mix", url: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" }
+        ];
+        let currentTrack = 0;
+        const audio = new Audio(tracks[currentTrack].url);
+        audio.loop = true;
+        let isPlaying = false;
+
+        const playBtn = document.getElementById('play-btn');
+        const viz = document.getElementById('visualizer');
+        const trackName = document.getElementById('track-name');
+        const record = document.getElementById('record');
+
+        function toggleMusic() {
+            if (!isPlaying) {
+                audio.play();
+                playBtn.innerHTML = "⏸";
+                viz.classList.remove('hidden');
+                record.style.animationPlayState = 'running';
+            } else {
+                audio.pause();
+                playBtn.innerHTML = "▶";
+                viz.classList.add('hidden');
+                record.style.animationPlayState = 'paused';
+            }
+            isPlaying = !isPlaying;
+        }
+
+        function loadTrack(index) {
+            audio.src = tracks[index].url;
+            trackName.innerText = tracks[index].name;
+            if (isPlaying) audio.play();
+        }
+
+        function nextTrack() { currentTrack = (currentTrack + 1) % tracks.length; loadTrack(currentTrack); }
+        function prevTrack() { currentTrack = (currentTrack - 1 + tracks.length) % tracks.length; loadTrack(currentTrack); }
+
+        document.getElementById('volume-slider').addEventListener('input', (e) => { audio.volume = e.target.value; });
+
+        function generateLargeVisualizer() {
+            const container = document.getElementById('large-visualizer');
+            for(let i=0; i<30; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'w-2 bg-[--pink] rounded-t-md';
+                bar.style.animation = `equalize ${0.5 + Math.random()}s infinite alternate ease-in-out`;
+                bar.style.animationDelay = `${Math.random()}s`;
+                container.appendChild(bar);
+            }
+        }
+
+        // --- 4. STREAMER CHAT ---
+        const messages = [
+            "HAPPY BIRTHDAY PRI ARENA!! 🎉", "W STREAMER! 🎂", "361 HYPE!! 🚀", 
+            "Radiant gameplay always ✨", "Drop the cake emotes in chat 🍰", 
+            "Best streamer on the platform no cap", "Happy birthday bestie!!"
+        ];
+        function startChat() {
+            const chatBox = document.getElementById('chat-box');
+            setInterval(() => {
+                const msg = document.createElement('div');
+                msg.className = 'chat-message text-sm p-3 bg-white/5 rounded-xl border border-white/5';
+                msg.innerHTML = `<strong class="text-[--pink]">Viewer_${Math.floor(Math.random()*999)}:</strong> <span class="text-gray-200">${messages[Math.floor(Math.random()*messages.length)]}</span>`;
+                chatBox.appendChild(msg);
+                chatBox.scrollTop = chatBox.scrollHeight;
+                if(chatBox.children.length > 6) chatBox.removeChild(chatBox.firstChild);
+            }, 2000);
+        }
+
+        // --- 5. INTERACTIVE FUN ---
+        function popHeart() {
+            confetti({ particleCount: 30, spread: 60, origin: { y: 0.8 }, colors: ['#ff85c0', '#ffffff'], shapes: ['circle'], scalar: 1.5 });
+        }
+        function popConfetti() {
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+        }
+
+        // --- 6. TYPEWRITER EFFECT ---
+        const textToType = "Dear Pri Arena,\n\nWatching you grow, stream, and build your community has been amazing. But even if you had zero subscribers, you'd still be my favorite person to hang out with. You've brought so much light and fun into my life, and I am so grateful to have a friend who feels exactly like family.\n\nKeep shining, keep streaming, and never stop being you.";
+        function typeLetter() {
+            const el = document.getElementById('typewriter-text');
+            let i = 0;
+            const typing = setInterval(() => {
+                if (i < textToType.length) {
+                    el.innerHTML += textToType.charAt(i) === '\n' ? '<br>' : textToType.charAt(i);
+                    i++;
+                } else {
+                    clearInterval(typing);
+                    gsap.to("#letter-sign", { opacity: 1, duration: 1.5 });
+                }
+            }, 40);
+        }
+
+        // --- 7. MONTAGE CROSSFADE ---
+        function startMontage() {
+            const images = document.querySelectorAll('#montage img');
+            let cur = 0;
+            setInterval(() => {
+                images[cur].classList.remove('active');
+                cur = (cur + 1) % images.length;
+                images[cur].classList.add('active');
+            }, 4000);
+        }
+
+        // --- 8. GRAND FINALE ---
+        let cakeCut = false;
+        function grandFinale() {
+            if(cakeCut) return;
+            cakeCut = true;
+
+            // Switch to energetic track
+            currentTrack = 2; loadTrack(2);
+            if(!isPlaying) toggleMusic();
+
+            // Massive fireworks
+            const duration = 15 * 1000;
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+                if (timeLeft <= 0) return clearInterval(interval);
+                const particleCount = 50 * (timeLeft / duration);
+                
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: Math.random() * 0.3, y: Math.random() - 0.2 }, colors: ['#ff85c0', '#e0b0ff', '#ffd700'] }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: Math.random() * 0.3 + 0.7, y: Math.random() - 0.2 }, colors: ['#ff85c0', '#e0b0ff', '#ffd700'] }));
+            }, 250);
+
+            // Hide button, show final text
+            document.querySelector('#cake-wrapper > div.absolute').style.display = 'none';
+            document.getElementById('final-cheer').style.opacity = '1';
+            document.getElementById('final-cheer').style.transform = 'translateY(0)';
+        }
+    </script>
+</body>
+</html>
