@@ -3,56 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Happy Birthday Penglow 🎂 | Best Streamer</title>
-    <!-- Google Fonts -->
+    <title>Congratulations on 2.49K Subscribers! ✨</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <!-- GSAP for Ultra-Smooth Animations -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <!-- Three.js for 3D Magical Background Matrix -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <!-- Canvas Confetti for Celebration Climaxes -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
+        /* --- CSS VARIABLES & THEMING --- */
         :root {
-            --bg-dark: #0c0813;
-            --primary: #ffb7da;
-            --accent-purple: #b39ddb;
-            --accent-glow: #ffe082;
-            --glass: rgba(255, 255, 255, 0.04);
-            --border-glass: rgba(255, 255, 255, 0.1);
-            --text-main: #f3f0f7;
-            --font-fancy: 'Caveat', cursive;
-            --font-sans: 'Poppins', sans-serif;
+            --bg-base: #030712;
+            --bg-surface: rgba(15, 23, 42, 0.6);
+            --bg-surface-glow: rgba(30, 41, 59, 0.8);
+            --accent-glow: #38bdf8;
+            --accent-purple: #818cf8;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --font-cinzel: 'Cinzel', serif;
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --transition-cinematic: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
+        /* --- CSS RESET & BASE STYLES --- */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
             user-select: none;
-            -webkit-user-drag: none;
         }
 
-        body, html {
-            width: 100%;
-            background-color: var(--bg-dark);
-            color: var(--text-main);
+        html, body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
             font-family: var(--font-sans);
             overflow-x: hidden;
             scroll-behavior: smooth;
         }
 
-        /* Webkit Scrollbar Customization */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: var(--bg-dark); }
-        ::-webkit-scrollbar-thumb { background: var(--accent-purple); border-radius: 4px; }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-base);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(56, 189, 248, 0.2);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(56, 189, 248, 0.5);
+        }
 
-        /* Background Canvas Elements */
-        #three-canvas {
+        /* --- GLOBAL BACKGROUND CANVAS & EFFECTS --- */
+        #snowCanvas {
             position: fixed;
             top: 0;
             left: 0;
@@ -62,1064 +67,1387 @@
             pointer-events: none;
         }
 
-        .interactive-overlay {
+        .cursor-glow {
+            position: fixed;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(56,189,248,0.08) 0%, rgba(129,140,248,0.02) 50%, rgba(0,0,0,0) 100%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 2;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: screen;
+            transition: width 0.3s, height 0.3s;
+        }
+
+        /* --- PREMIUM LOADER SCREEN --- */
+        #loader {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            background: #020617;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .loader-logo {
+            font-family: var(--font-cinzel);
+            font-size: 2.5rem;
+            letter-spacing: 0.5rem;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(56, 189, 248, 0.6);
+            margin-bottom: 20px;
+            animation: pulseGlow 2s infinite ease-in-out;
+        }
+        .loader-bar {
+            width: 200px;
+            height: 2px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+        .loader-progress {
+            position: absolute;
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-glow), var(--accent-purple));
+            box-shadow: 0 0 10px var(--accent-glow);
+            animation: loadProgress 2.5s forwards cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.6; text-shadow: 0 0 10px rgba(56, 189, 248, 0.3); }
+            50% { opacity: 1; text-shadow: 0 0 30px rgba(56, 189, 248, 0.8); }
+        }
+        @keyframes loadProgress {
+            0% { width: 0%; }
+            50% { width: 70%; }
+            100% { width: 100%; }
+        }
+
+        /* --- INTERACTIVE FLOATING UTILITIES --- */
+        .audio-control {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            z-index: 1000;
+            background: var(--bg-surface);
+            border: 1px solid var(--glass-border);
+            padding: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+            backdrop-filter: blur(12px);
+            transition: var(--transition-cinematic);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .audio-control:hover {
+            border-color: var(--accent-glow);
+            box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+            transform: scale(1.1);
+        }
+        .audio-control svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--text-primary);
+        }
+
+        /* Floating Sidebar Navigation Menu */
+        .side-nav {
+            position: fixed;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            background: rgba(15, 23, 42, 0.4);
+            padding: 20px 10px;
+            border-radius: 30px;
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--glass-border);
+        }
+        .nav-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            position: relative;
+            transition: var(--transition-cinematic);
+        }
+        .nav-dot:hover, .nav-dot.active {
+            background: var(--accent-glow);
+            box-shadow: 0 0 10px var(--accent-glow);
+            transform: scale(1.3);
+        }
+        .nav-dot::after {
+            content: attr(data-label);
+            position: absolute;
+            right: 25px;
+            top: 50%;
+            transform: translateY(-50%) translateX(10px);
+            background: var(--bg-surface);
+            border: 1px solid var(--glass-border);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            color: var(--text-primary);
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition-cinematic);
+        }
+        .nav-dot:hover::after {
+            opacity: 1;
+            transform: translateY(-50%) translateX(0);
+        }
+
+        /* Social Icons Floating Link Drawer */
+        .social-drawer {
+            position: fixed;
+            left: 30px;
+            bottom: 30px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .social-icon {
+            background: var(--bg-surface);
+            border: 1px solid var(--glass-border);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            backdrop-filter: blur(12px);
+            transition: var(--transition-cinematic);
+            text-decoration: none;
+            color: white;
+            font-size: 1.2rem;
+        }
+        .social-icon:hover {
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 15px rgba(129, 140, 248, 0.4);
+            transform: translateY(-5px);
+        }
+
+        /* --- EASTER EGG ELEMENTS --- */
+        .easter-egg-penguin {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 40px;
+            height: 40px;
+            background: var(--bg-surface);
+            border: 1px solid var(--glass-border);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 1000;
+            backdrop-filter: blur(12px);
+            transition: var(--transition-cinematic);
+            font-size: 1.2rem;
+        }
+        .easter-egg-penguin:hover {
+            transform: rotate(15deg) scale(1.1);
+            border-color: var(--accent-glow);
+        }
+        .egg-notification {
+            position: fixed;
+            bottom: 85px;
+            right: 30px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid var(--accent-glow);
+            padding: 15px var(--radius-md);
+            border-radius: var(--radius-md);
+            max-width: 280px;
+            z-index: 1001;
+            transform: translateY(20px);
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition-cinematic);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+        .egg-notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Footprints tracking overlay container */
+        .footprint {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            background-image: url("IMG1.jpg' viewBox='0 0 24 24' fill='%2338bdf8' opacity='0.25'><path d='M12,2A3,3,0,0,0,9,5c0,1.5,1,2.5,2,3.5C9,9.5,6,12,6,15a4,4,0,0,0,8,0C14,12,13,9.5,12,2Z'/></svg>");
+            background-size: contain;
+            background-repeat: no-repeat;
+            pointer-events: none;
             z-index: 2;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: opacity 1.5s, transform 1s;
+        }
+
+        /* --- MULTI-PAGE VIEWPORT PANELS --- */
+        .celebration-panel {
+            position: relative;
+            min-height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 80px 10%;
+            z-index: 5;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255,255,255,0.02);
+        }
+
+        /* Scroll Animation States */
+        .reveal-element {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal-element.active-reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- COMPONENTS & COMMONS --- */
+        .glass-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            backdrop-filter: blur(16px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.4);
+            transition: var(--transition-cinematic);
+        }
+        .glass-card:hover {
+            border-color: rgba(56, 189, 248, 0.2);
+            background: var(--bg-surface-glow);
+            transform: translateY(-5px);
+        }
+
+        .cinematic-title {
+            font-family: var(--font-cinzel);
+            font-size: 3rem;
+            letter-spacing: 0.3rem;
+            text-align: center;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #fff 30%, var(--accent-glow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle-premium {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            letter-spacing: 0.15rem;
+            text-transform: uppercase;
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .btn-icy-glow {
+            font-family: var(--font-sans);
+            font-weight: 600;
+            letter-spacing: 0.1rem;
+            color: #fff;
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(129, 140, 248, 0.2));
+            border: 1px solid rgba(56, 189, 248, 0.4);
+            padding: 16px 40px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition-cinematic);
+            backdrop-filter: blur(8px);
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.1);
+        }
+        .btn-icy-glow:hover {
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.4), rgba(129, 140, 248, 0.4));
+            border-color: var(--accent-glow);
+            box-shadow: 0 0 30px rgba(56, 189, 248, 0.4);
+            transform: scale(1.05);
+        }
+
+        /* --- PAGE 1: HERO VIEW --- */
+        #hero-panel {
+            background: radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.8) 0%, #020617 100%);
+        }
+        .hero-portrait-wrapper {
+            position: relative;
+            width: 320px;
+            height: 320px;
+            margin-bottom: 40px;
+            border-radius: 50%;
+            padding: 8px;
+            background: linear-gradient(135deg, var(--accent-glow), var(--accent-purple));
+            box-shadow: 0 0 50px rgba(56,189,248,0.3);
+        }
+        .hero-portrait {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #0f172a;
+        }
+        .hero-badge-penguin {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: #0f172a;
+            border: 2px solid var(--accent-glow);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            animation: floatBounce 4s infinite ease-in-out;
+        }
+        @keyframes floatBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* --- PAGE 2: JOURNEY TIMELINE --- */
+        .timeline-container {
+            position: relative;
+            max-width: 900px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        .timeline-container::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--accent-glow), var(--accent-purple), transparent);
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .timeline-block {
+            position: relative;
+            margin-bottom: 60px;
+            width: 50%;
+            clear: both;
+        }
+        .timeline-block-left {
+            float: left;
+            padding-right: 40px;
+            text-align: right;
+        }
+        .timeline-block-right {
+            float: right;
+            padding-left: 40px;
+            text-align: left;
+        }
+        .timeline-node {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #0f172a;
+            border: 3px solid var(--accent-glow);
+            border-radius: 50%;
+            top: 20px;
+            z-index: 10;
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+        .timeline-block-left .timeline-node { right: -10px; }
+        .timeline-block-right .timeline-node { left: -10px; }
+        
+        .counter-highlight {
+            font-family: var(--font-cinzel);
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 0 25px rgba(56, 189, 248, 0.4);
+        }
+
+        /* --- PAGE 3: ABOUT CHANNEL --- */
+        .cards-matrix {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            width: 100%;
+            max-width: 1100px;
+        }
+        .card-pillar {
+            text-align: center;
+            position: relative;
+        }
+        .pillar-icon {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--accent-glow);
+            display: inline-block;
+        }
+        .pillar-title {
+            font-family: var(--font-cinzel);
+            font-size: 1.3rem;
+            margin-bottom: 12px;
+            letter-spacing: 0.1rem;
+        }
+        .pillar-desc {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        .sticker-float {
+            position: absolute;
+            font-size: 1.5rem;
+            top: -15px;
+            right: -15px;
+            opacity: 0.7;
+            animation: floatBounce 5s infinite ease-in-out alternate;
+        }
+
+        /* --- PAGE 4: PHOTO MEMORY GALLERY --- */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 1100px;
+            width: 100%;
+        }
+        .gallery-item {
+            position: relative;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            aspect-ratio: 4/3;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition-cinematic);
+            filter: grayscale(20%);
+        }
+        .gallery-item:hover img {
+            transform: scale(1.08);
+            filter: grayscale(0%);
+        }
+        .gallery-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(2,6,23,0.8), transparent);
+            opacity: 0;
+            display: flex;
+            align-items: flex-end;
+            padding: 20px;
+            transition: var(--transition-cinematic);
+        }
+        .gallery-item:hover .gallery-overlay {
+            opacity: 1;
+        }
+        .gallery-item-wide {
+            grid-column: span 2;
+        }
+
+        /* --- PAGE 5: FAN ENERGY --- */
+        .testimonials-track {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
+        }
+        .fan-bubble {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+        .fan-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-glow));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        .fan-message {
+            font-style: italic;
+            line-height: 1.5;
+            color: rgba(255,255,255,0.9);
+        }
+        .fan-author {
+            display: block;
+            margin-top: 5px;
+            font-size: 0.8rem;
+            color: var(--accent-glow);
+            font-style: normal;
+            letter-spacing: 0.05rem;
+        }
+
+        /* --- PAGE 6: ACHIEVEMENTS PANELS --- */
+        .stats-showcase {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            max-width: 900px;
+            width: 100%;
+        }
+        .stat-badge-card {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+        .stat-icon-plate {
+            width: 70px;
+            height: 70px;
+            border-radius: var(--radius-md);
+            background: rgba(56, 189, 248, 0.1);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--accent-glow);
+        }
+        .stat-num {
+            font-family: var(--font-cinzel);
+            font-size: 2rem;
+            font-weight: 700;
+            color: #fff;
+        }
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05rem;
+        }
+
+        /* --- PAGE 7: YOUTUBE HUB SHOWCASE --- */
+        .yt-mockup {
+            width: 100%;
+            max-width: 950px;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            background: #0f141c;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.6);
+        }
+        .yt-banner {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        .yt-header-bar {
+            padding: 30px;
+            display: flex;
+            gap: 25px;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            position: relative;
+        }
+        .yt-pfp-container {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid #0f141c;
+            margin-top: -60px;
+            z-index: 5;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            background: #1e293b;
+        }
+        .yt-pfp-container img { width: 100%; height: 100%; object-fit: cover; }
+        .yt-meta-info h3 { font-family: var(--font-sans); font-size: 1.5rem; margin-bottom: 5px; }
+        .yt-meta-info p { color: var(--text-secondary); font-size: 0.9rem; }
+        .yt-videos-grid {
+            padding: 35px;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        .yt-video-thumb {
+            background: rgba(255,255,255,0.02);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .thumb-img-wrapper {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #1e293b;
+            overflow: hidden;
+        }
+        .thumb-img-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+        .thumb-title { padding: 12px; font-size: 0.85rem; font-weight: 600; line-height: 1.4; }
+
+        /* --- PAGE 8: SCRAPBOOK SPECIAL MOMENTS --- */
+        .scrapbook-layout {
+            display: flex;
+            align-items: center;
+            gap: 50px;
+            max-width: 1000px;
+            width: 100%;
+        }
+        .scrapbook-frame-container {
+            position: relative;
+            flex-shrink: 0;
+            width: 380px;
+            height: 460px;
+            background: #fff;
+            padding: 15px 15px 60px 15px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            transform: rotate(-3deg);
+            transition: var(--transition-cinematic);
+        }
+        .scrapbook-frame-container:hover {
+            transform: rotate(0deg) scale(1.02);
+        }
+        .scrapbook-photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: #e2e8f0;
+        }
+        .scrapbook-caption {
+            position: absolute;
+            bottom: 15px;
+            left: 20px;
+            right: 20px;
+            font-family: var(--font-cinzel);
+            color: #1e293b;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+        .scrapbook-narrative {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        /* --- PAGE 9: FUTURE LANDSCAPES --- */
+        .cosmic-vision-box {
+            text-align: center;
+            max-width: 800px;
+            position: relative;
+        }
+        .space-concept-track {
+            margin: 40px auto 0 auto;
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 2px;
+            position: relative;
+        }
+        .space-progress-line {
+            position: absolute;
+            top: 0; left: 0; height: 100%;
+            width: 65%;
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-glow));
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+        .rocket-node-penguin {
+            position: absolute;
+            top: -18px;
+            left: 65%;
+            transform: translateX(-50%);
+            font-size: 1.8rem;
+            text-shadow: 0 0 15px var(--accent-glow);
+            animation: thrustPulse 0.2s infinite ease-in-out alternate;
+        }
+        @keyframes thrustPulse {
+            0% { transform: translateX(-50%) translateY(0); }
+            100% { transform: translateX(-50%) translateY(-3px); }
+        }
+
+        /* --- PAGE 10: HEARTFELT MESSAGE --- */
+        .emotional-letter-container {
+            max-width: 800px;
+            width: 100%;
+            line-height: 2;
+            font-size: 1.25rem;
+            text-align: center;
+            min-height: 250px;
+            position: relative;
+        }
+        .typing-writer-surface {
+            color: rgba(248, 250, 252, 0.95);
+            text-shadow: 0 0 1px rgba(255,255,255,0.2);
+        }
+        .closing-tagline {
+            margin-top: 60px;
+            font-family: var(--font-cinzel);
+            font-size: 1rem;
+            letter-spacing: 0.2rem;
+            color: var(--accent-glow);
+            text-transform: uppercase;
+        }
+
+        /* --- PRE-RENDERED FIXED REUSABLE FOOTER --- */
+        .global-panel-footer {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 0.75rem;
+            color: rgba(148, 163, 184, 0.4);
+            letter-spacing: 0.1rem;
+            text-transform: uppercase;
             pointer-events: none;
         }
 
-        /* Global Structural Styles */
-        .page {
-            position: relative;
-            width: 100%;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 4rem 2rem;
-            z-index: 3;
-            overflow: hidden;
-            box-sizing: border-box;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+        /* --- RESPONSIVE MEDIA STYLING CONFIGS --- */
+        @media (max-width: 968px) {
+            .celebration-panel { padding: 80px 5%; }
+            .cinematic-title { font-size: 2.2rem; }
+            .timeline-container::after { left: 20px; }
+            .timeline-block { width: 100%; float: none; padding-left: 50px; padding-right: 0; text-align: left; }
+            .timeline-node { left: 10px !important; }
+            .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+            .gallery-item-wide { grid-column: span 1; }
+            .stats-showcase { grid-template-columns: 1fr; }
+            .yt-videos-grid { grid-template-columns: 1fr; }
+            .scrapbook-layout { flex-direction: column; }
+            .scrapbook-frame-container { width: 100%; max-width: 340px; height: 400px; }
+            .side-nav { display: none; }
         }
-
-        .glass-card {
-            background: rgba(18, 11, 28, 0.65);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--border-glass);
-            border-radius: 24px;
-            padding: 3rem;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.1);
-            max-width: 900px;
-            width: 100%;
-            text-align: center;
-            transition: border 0.3s ease;
-        }
-        .glass-card:hover {
-            border-color: var(--primary);
-        }
-
-        h1, h2, h3 {
-            font-weight: 700;
-            letter-spacing: -0.5px;
-        }
-
-        .gradient-text {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent-purple) 50%, var(--accent-glow) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0px 2px 10px rgba(255, 183, 218, 0.3));
-        }
-
-        /* Floating Audio Controller */
-        .audio-player {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            background: rgba(12, 8, 19, 0.85);
-            border: 1px solid var(--border-glass);
-            backdrop-filter: blur(12px);
-            padding: 12px 20px;
-            border-radius: 50px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            z-index: 999;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        .player-btn {
-            background: none;
-            border: none;
-            color: var(--text-main);
-            cursor: pointer;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.2s, color 0.2s;
-        }
-        .player-btn:hover { color: var(--primary); transform: scale(1.1); }
-        .audio-info { font-size: 0.75rem; opacity: 0.8; max-width: 130px; line-height: 1.2; }
-        
-        .visualizer {
-            display: flex;
-            align-items: flex-end;
-            gap: 3px;
-            height: 20px;
-        }
-        .v-bar {
-            width: 3px;
-            height: 5px;
-            background: var(--primary);
-            border-radius: 2px;
-            transition: height 0.1s ease;
-        }
-        .visualizer.playing .v-bar {
-            animation: bounce 0.6s infinite alternate;
-        }
-        .visualizer.playing .v-bar:nth-child(2) { animation-delay: 0.15s; }
-        .visualizer.playing .v-bar:nth-child(3) { animation-delay: 0.30s; }
-        .visualizer.playing .v-bar:nth-child(4) { animation-delay: 0.45s; }
-
-        @keyframes bounce {
-            0% { height: 4px; }
-            100% { height: 20px; }
-        }
-
-        /* Loading Screen Overlay */
-        #loader {
-            position: fixed;
-            top:0; left:0; width:100vw; height:100vh;
-            background: var(--bg-dark);
-            z-index: 10000;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-        }
-        .loader-heart {
-            font-size: 3rem;
-            animation: pulse 1.2s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 5px var(--primary)); }
-            50% { transform: scale(1.2); filter: drop-shadow(0 0 20px var(--primary)); }
-        }
-        .loader-bar-container {
-            width: 200px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;
-        }
-        .loader-progress {
-            width: 0%; height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent-purple));
-        }
-
-        /* Buttons Styling */
-        .btn-cinematic {
-            position: relative;
-            background: linear-gradient(135deg, rgba(255,183,218,0.2) 0%, rgba(179,157,219,0.2) 100%);
-            border: 1px solid var(--primary);
-            color: #fff;
-            padding: 14px 32px;
-            font-size: 1rem;
-            font-weight: 600;
-            border-radius: 50px;
-            cursor: pointer;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 20px rgba(255,183,218,0.15);
-            letter-spacing: 1px;
-            margin-top: 1.5rem;
-        }
-        .btn-cinematic::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%; width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: all 0.6s ease;
-        }
-        .btn-cinematic:hover::before { left: 100%; }
-        .btn-cinematic:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(255,183,218,0.4);
-            border-color: #fff;
-        }
-
-        /* Unique Elements Page 1: Intro */
-        .intro-title { font-size: 3.5rem; margin-bottom: 1rem; }
-        .intro-subtitle { font-size: 1.2rem; opacity: 0.9; margin-bottom: 2rem; font-weight: 300; }
-
-        /* Unique Elements Page 2: Best Friend Portrait */
-        .portrait-container {
-            position: relative;
-            width: 300px; height: 380px;
-            margin: 2rem auto;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
-            border: 3px solid #fff;
-            overflow: hidden;
-            transform: rotate(-3deg);
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .portrait-container:hover {
-            transform: rotate(0deg) scale(1.05);
-        }
-        .placeholder-img {
-            width: 100%; height: 100%;
-            background: linear-gradient(45deg, #231932, #493266);
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            color: rgba(255,255,255,0.4); text-align: center; font-size: 0.9rem; padding: 20px;
-        }
-        .placeholder-img svg { width: 50px; height: 50px; fill: rgba(255,255,255,0.2); margin-bottom: 15px; }
-        .caption-tag {
-            background: rgba(0,0,0,0.75); color: #fff; padding: 6px 16px; border-radius: 20px;
-            font-size: 0.85rem; position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%);
-            border: 1px solid var(--primary); white-space: nowrap;
-        }
-
-        /* Unique Elements Page 3: Streamer Achievement Counter & Simulated Chat */
-        .streamer-dashboard {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem; text-align: left;
-        }
-        @media(max-width: 768px) { .streamer-dashboard { grid-template-columns: 1fr; } }
-        
-        .counter-box {
-            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 16px; padding: 2rem; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            position: relative; overflow: hidden;
-        }
-        .counter-box::before {
-            content: 'LIVE'; position: absolute; top: 15px; right: 15px; background: #ff4a4a;
-            color: white; font-size: 0.65rem; font-weight: bold; padding: 2px 8px; border-radius: 4px;
-            animation: pulse 1s infinite;
-        }
-        .sub-number { font-size: 4rem; font-weight: 700; color: var(--accent-glow); margin: 0.5rem 0; }
-        .badge-premium {
-            background: linear-gradient(90deg, #ffd700, #ffa500); color: #000;
-            padding: 4px 12px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; letter-spacing: 1px;
-        }
-
-        .live-chat-box {
-            background: #09050e; border: 1px solid var(--border-glass); border-radius: 16px;
-            height: 250px; display: flex; flex-direction: column; overflow: hidden; font-size: 0.85rem;
-        }
-        .chat-header { background: #140d1f; padding: 10px; font-weight: bold; font-size: 0.8rem; border-bottom: 1px solid var(--border-glass); color: var(--primary); }
-        .chat-messages { padding: 10px; overflow-y: auto; flex-grow: 1; display: flex; flex-direction: column; gap: 8px; }
-        .chat-line { line-height: 1.4; animation: fadeInUp 0.4s ease both; }
-        .chat-user { font-weight: 600; margin-right: 6px; }
-        .chat-user.mod { color: #5cff9d; }
-        .chat-user.sub { color: #5ce1ff; }
-        .chat-user.friend { color: var(--primary); }
-
-        /* Unique Elements Page 4: Draggable Polaroids Gallery */
-        .polaroid-canvas {
-            position: relative; width: 100%; height: 500px; background: rgba(0,0,0,0.2);
-            border-radius: 20px; border: 1px dashed rgba(255,255,255,0.1); overflow: hidden;
-        }
-        .polaroid-drag {
-            position: absolute; width: 180px; padding: 12px 12px 24px 12px; background: #fff; color: #222;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3); border-radius: 4px; cursor: move;
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
-        }
-        .polaroid-drag:active { transform: scale(1.05) rotate(0deg) !important; z-index: 100 !important; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
-        .polaroid-drag .img-placeholder { width: 100%; height: 150px; background: #e0e0e0; margin-bottom: 12px; border-radius: 2px; position: relative; overflow: hidden;}
-        .polaroid-drag p { font-family: var(--font-fancy); font-size: 1.3rem; text-align: center; color: #333; }
-
-        /* Unique Elements Page 5: Timeline */
-        .timeline { position: relative; max-width: 700px; margin: 2rem auto; padding-left: 30px; border-left: 2px solid var(--accent-purple); text-align: left;}
-        .timeline-item { position: relative; margin-bottom: 2.5rem; }
-        .timeline-item::before {
-            content: ''; position: absolute; left: -37px; top: 5px; width: 12px; height: 12px;
-            border-radius: 50%; background: var(--primary); border: 3px solid var(--bg-dark);
-        }
-        .timeline-date { font-weight: 700; color: var(--accent-glow); font-size: 0.9rem; margin-bottom: 4px;}
-        .timeline-title { font-weight: 600; font-size: 1.1rem; margin-bottom: 6px;}
-        .timeline-desc { font-size: 0.9rem; opacity: 0.8; }
-
-        /* Unique Elements Page 6: Music Experience Section */
-        .vibe-visualizer-container {
-            display: flex; align-items: center; justify-content: center; gap: 8px; margin: 2rem auto; height: 80px; width: 100%; max-width: 400px;
-        }
-        .vibe-bar { width: 8px; height: 15px; background: linear-gradient(to top, var(--accent-purple), var(--primary)); border-radius: 4px; }
-
-        /* Unique Elements Page 7: Click Explosions and Mini-Interactions */
-        .interaction-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; margin-top: 2rem;}
-        .interactive-tile {
-            background: rgba(255,255,255,0.03); border: 1px solid var(--border-glass); border-radius: 16px; padding: 1.5rem;
-            cursor: pointer; transition: all 0.2s;
-        }
-        .interactive-tile:hover { background: rgba(255,255,255,0.08); transform: translateY(-4px); border-color: var(--primary); }
-        .tile-icon { font-size: 2rem; margin-bottom: 8px; }
-
-        /* Unique Elements Page 8: Handwritten Message Letter */
-        .handwritten-letter {
-            font-family: var(--font-fancy); font-size: 1.8rem; line-height: 1.6; text-align: left;
-            max-width: 650px; margin: 0 auto; color: #ffebee; border-left: 3px double rgba(255,183,218,0.3); padding-left: 2rem;
-        }
-
-        /* Unique Elements Page 9: Fullscreen Cinematic Slideshow */
-        .slideshow-window {
-            position: relative; width: 100%; max-width: 750px; height: 420px; margin: 2rem auto;
-            border-radius: 20px; overflow: hidden; border: 1px solid var(--border-glass);
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-        }
-        .slide {
-            position: absolute; width: 100%; height: 100%; top:0; left:0; opacity: 0;
-            transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;
-            transform: scale(1.05);
-        }
-        .slide.active { opacity: 1; transform: scale(1); }
-        .slide-caption {
-            position: absolute; bottom: 0; left: 0; width: 100%; padding: 30px;
-            background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
-            text-align: left;
-        }
-
-        /* Unique Elements Page 10: Grand Finale Cake and Interactive Triggers */
-        .cake-container { position: relative; margin: 2rem auto; cursor: pointer; display: inline-block;}
-        .cake-graphic { font-size: 6rem; transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); filter: drop-shadow(0 0 10px rgba(255,183,218,0.3));}
-        .cake-container:hover .cake-graphic { transform: scale(1.15); filter: drop-shadow(0 0 25px var(--primary));}
-        .flame-particle {
-            position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
-            font-size: 1.5rem; animation: flicker 0.3s infinite alternate;
-        }
-        @keyframes flicker { 0% { opacity: 0.8; transform: translateX(-50%) scale(0.9); } 100% { opacity: 1; transform: translateX(-50%) scale(1.1); } }
-
-        /* General Helper Animations */
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Secret Message Hover Tooltip Style */
-        .secret-hover {
-            position: relative; display: inline-block; border-bottom: 1px dashed var(--accent-glow); cursor: help; color: var(--accent-glow);
-        }
-        .secret-hover::after {
-            content: attr(data-secret);
-            position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%) scale(0.8);
-            background: rgba(12, 8, 19, 0.95); border: 1px solid var(--accent-glow); color: #fff;
-            padding: 8px 14px; border-radius: 8px; font-size: 0.75rem; width: 220px; text-align: center;
-            opacity: 0; pointer-events: none; transition: all 0.25s cubic-bezier(0.075, 0.82, 0.165, 1);
-            font-family: var(--font-sans); line-height: 1.3; box-shadow: 0 10px 20px rgba(0,0,0,0.4);
-            z-index: 100;
-        }
-        .secret-hover:hover::after { opacity: 1; transform: translateX(-50%) scale(1); }
     </style>
 </head>
 <body>
 
-    <!-- Three.js Ambient 3D Particle Space Matrix -->
-    <canvas id="three-canvas"></canvas>
-    
-    <!-- Mouse Reactive Interactive Overlay -->
-    <div class="interactive-overlay" id="sparkle-overlay"></div>
-
-    <!-- Global Cinematic Audio Player Controllers -->
-    <div class="audio-player">
-        <button class="player-btn" id="play-pause-btn" aria-label="Play/Pause Background Music">▶</button>
-        <div class="audio-info">
-            <span style="font-weight: 600; color: var(--primary);">Golden Hour</span><br>
-            <span style="opacity: 0.6; font-size:0.65rem;">Soft Ambient LoFi Remix</span>
-        </div>
-        <div class="visualizer" id="main-visualizer">
-            <div class="v-bar"></div>
-            <div class="v-bar"></div>
-            <div class="v-bar"></div>
-            <div class="v-bar"></div>
-        </div>
-    </div>
-
-    <!-- Unified Preloader Screen -->
+    <!-- LOADING SCREEN -->
     <div id="loader">
-        <div class="loader-heart">💝</div>
-        <div style="font-weight: 600; font-size: 0.9rem; letter-spacing: 2px; color: var(--primary);">CREATING THE MAGIC...</div>
-        <div class="loader-bar-container">
-            <div class="loader-progress" id="load-progress-bar"></div>
-        </div>
+        <div class="loader-logo">CREW IS READY</div>
+        <div class="loader-bar"><div class="loader-progress"></div></div>
     </div>
 
-    <!-- ========================================================= -->
-    <!-- PAGE 1: CINEMATIC INTRO DUCTION VIEW                     -->
-    <!-- ========================================================= -->
-    <section class="page" id="page-intro">
-        <div class="glass-card" style="transform: translateY(30px); opacity: 0;" id="intro-card">
-            <h1 class="intro-title gradient-text">Happy Birthday Penglow 🎂</h1>
-            <p class="intro-subtitle">To the Best Streamer, Amazing Friend & My Favorite Human ❤️</p>
-            <p style="font-size: 0.9rem; opacity: 0.7; max-width: 500px; margin: 0 auto 1.5rem auto;">
-                Welcome to a customized luxury digital space designed to celebrate everything that makes you brilliant. Turn up your volume.
-            </p>
-            <button class="btn-cinematic" onclick="scrollToPage('#page-friend')">Enter the Surprise ✨</button>
+    <!-- BACKGROUND ENGINE UTILITIES -->
+    <canvas id="snowCanvas"></canvas>
+    <div class="cursor-glow" id="mouseGlow"></div>
+
+    <!-- SYSTEM FLOATING INTERFACES -->
+    <div class="audio-control" id="audioToggle" title="Toggle Soundscape">
+        <svg viewBox="0 0 24 24" id="audioOnIcon"><path d="M6 9V15H10L15 20V4L10 9H6Z"/></svg>
+    </div>
+
+    <div class="side-nav">
+        <div class="nav-dot active" data-target="hero-panel" data-label="Celebration Top"></div>
+        <div class="nav-dot" data-target="journey-panel" data-label="The Journey"></div>
+        <div class="nav-dot" data-target="about-panel" data-label="Channel DNA"></p></div>
+        <div class="nav-dot" data-target="gallery-panel" data-label="Memory Reel"></div>
+        <div class="nav-dot" data-target="fan-panel" data-label="Fan Energy"></div>
+        <div class="nav-dot" data-target="achieve-panel" data-label="Milestone Ledger"></div>
+        <div class="nav-dot" data-target="yt-panel" data-label="YouTube Hub"></div>
+        <div class="nav-dot" data-target="moments-panel" data-label="Scrapbook Vault"></div>
+        <div class="nav-dot" data-target="future-panel" data-label="Horizon Focus"></div>
+        <div class="nav-dot" data-target="final-panel" data-label="Heartfelt Note"></div>
+    </div>
+
+    <div class="social-drawer">
+        <a href="#" class="social-icon" title="YouTube Profile">🍿</a>
+        <a href="#" class="social-icon" title="Community Feed">💬</a>
+    </div>
+
+    <div class="easter-egg-penguin" id="secretPenguin" title="Click Me!">🐧</div>
+    <div class="egg-notification" id="eggBubble"><b>Waddle System Activated!</b> 🐧 "She believed she could, so she did! Thanks for being an absolute rockstar!"</div>
+
+
+    <!-- ==========================================
+         PAGE 1 — INTRO / HERO PAGE
+         ========================================== -->
+    <section class="celebration-panel" id="hero-panel">
+        <div class="hero-portrait-wrapper reveal-element">
+            <!-- REPLACE: 'HERO_IMAGE_PLACEHOLDER' with high-res feature profile portrait -->
+            <img src="IMG2.jpg' width='300' height='300' viewBox='0 0 300 300'><rect width='300' height='300' fill='%231e293b'/><text x='50%27 y='50%27 dominant-baseline='middle' text-anchor='middle' fill='%2364748b'>HERO_IMAGE_PLACEHOLDER</text></svg>" alt="Creator Celebration Frame" class="hero-portrait">
+            <div class="hero-badge-penguin">🐧</div>
         </div>
+        <h1 class="cinematic-title reveal-element">CONGRATULATIONS!</h1>
+        <p class="subtitle-premium reveal-element" style="color: var(--accent-glow); font-weight: 700;">2.49K Subscribers Achieved</p>
+        <button class="btn-icy-glow reveal-element" onclick="document.getElementById('journey-panel').scrollIntoView();">
+            Enter Celebration <span>❄️</span>
+        </button>
+        <div class="global-panel-footer">Section I / Milestone Horizon</div>
     </section>
 
-    <!-- ========================================================= -->
-    <!-- PAGE 2: BEST FRIEND TRIBUTE EMBEDMENT                     -->
-    <!-- ========================================================= -->
-    <section class="page" id="page-friend">
-        <div class="glass-card">
-            <h2 class="gradient-text" style="font-size: 2.2rem; margin-bottom: 1rem;">The Kind of Friend Everyone Wishes For ❤️</h2>
-            <p style="max-width:600px; margin: 0 auto 1.5rem auto; line-height:1.6; font-size:0.95rem;">
-                Some people just make the world brighter by being in it. From late-night gaming talks to sharing endless laughs, you have been absolute gold. Today is all about celebrating you!
-            </p>
-            
-            <!-- Structural Polaroid Frame Setup -->
-            <div class="portrait-container">
-                <div class="placeholder-img">
-                    <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V5h14v14zm-5.04-6.71l-2.75 3.54-1.96-2.36L6.5 17h11l-3.54-4.71z"/></svg>
-                    <span style="font-size:0.8rem; line-height: 1.4;">[ Drop Your Favorite Portrait Photo File Asset Here ]</span>
+
+    <!-- ==========================================
+         PAGE 2 — JOURNEY PAGE
+         ========================================== -->
+    <section class="celebration-panel" id="journey-panel">
+        <h2 class="cinematic-title reveal-element">The Growth Journey</h2>
+        <p class="subtitle-premium reveal-element">Tracing every structural milestone</p>
+        
+        <div class="timeline-container">
+            <div class="timeline-block timeline-block-left reveal-element">
+                <div class="timeline-node"></div>
+                <div class="glass-card">
+                    <div class="counter-highlight">0.1K</div>
+                    <p style="margin-top: 10px; color: var(--text-secondary);">The Foundation Block. Planting flags, testing configurations, establishing the unique creative tone.</p>
                 </div>
-                <div class="caption-tag">Best Friend Energy ❤️</div>
             </div>
-
-            <p style="font-style: italic; opacity: 0.8; font-size: 0.9rem; margin-top: 1rem;">
-                Hover over the portrait to see it snap into standard focal placement.
-            </p>
+            <div class="timeline-block timeline-block-right reveal-element">
+                <div class="timeline-node"></div>
+                <div class="glass-card">
+                    <div class="counter-highlight">1.0K</div>
+                    <p style="margin-top: 10px; color: var(--text-secondary);">Four Digit Expansion. The community system triggers network effects. Trust and content loops lock in place.</p>
+                </div>
+            </div>
+            <div class="timeline-block timeline-block-left reveal-element">
+                <div class="timeline-node"></div>
+                <div class="glass-card">
+                    <div class="counter-highlight" style="color: var(--accent-glow);">2.49K</div>
+                    <p style="margin-top: 10px; color: var(--text-secondary);">Present Peak Core. High affinity, dedicated viewer velocity, and established creative authority.</p>
+                </div>
+            </div>
         </div>
+        <div class="global-panel-footer">Section II / Evolution Track</div>
     </section>
 
-    <!-- ========================================================= -->
-    <!-- PAGE 3: STREAMER ACHIEVEMENT & LIVE CHAT SIMULATOR         -->
-    <!-- ========================================================= -->
-    <section class="page" id="page-streamer">
-        <div class="glass-card">
-            <span class="badge-premium">ACHIEVEMENT UNLOCKED</span>
-            <h2 class="gradient-text" style="font-size: 2.3rem; margin: 0.5rem 0 1.5rem 0;">Congratulations on 1.6K Subscribers 🎮✨</h2>
-            
-            <div class="streamer-dashboard">
-                <div class="counter-box">
-                    <span style="font-size: 0.8rem; font-weight: 600; opacity: 0.7;">TOTAL SUB COUNT</span>
-                    <div class="sub-number" id="sub-counter">0</div>
-                    <span class="badge-premium" style="background: var(--primary);">BEST STREAMER</span>
-                </div>
 
-                <div class="live-chat-box">
-                    <div class="chat-header">🔴 Live Birthday Chat Playback</div>
-                    <div class="chat-messages" id="live-chat-container">
-                        <!-- Chat elements injected sequentially via JS Engine execution loops -->
+    <!-- ==========================================
+         PAGE 3 — ABOUT HER CHANNEL
+         ========================================== -->
+    <section class="celebration-panel" id="about-panel">
+        <h2 class="cinematic-title reveal-element">Channel Ecosystem</h2>
+        <p class="subtitle-premium reveal-element">Multi-layered engagement frameworks</p>
+
+        <div class="cards-matrix">
+            <div class="glass-card card-pillar reveal-element">
+                <div class="sticker-float">🧊</div>
+                <div class="pillar-icon">🎮</div>
+                <h3 class="pillar-title">Gaming</h3>
+                <p class="pillar-desc">High-tier mechanical execution meets entertaining analytical playstyles.</p>
+            </div>
+            <div class="glass-card card-pillar reveal-element">
+                <div class="sticker-float">⚡</div>
+                <div class="pillar-icon">🎥</div>
+                <h3 class="pillar-title">Streaming</h3>
+                <p class="pillar-desc">Uncut real-time personality processing. Building deep connections live.</p>
+            </div>
+            <div class="glass-card card-pillar reveal-element">
+                <div class="sticker-float">❄️</div>
+                <div class="pillar-icon">🎪</div>
+                <h3 class="pillar-title">Entertainment</h3>
+                <p class="pillar-desc">Curated cultural reviews, comedic timing, and dynamic situational content.</p>
+            </div>
+            <div class="glass-card card-pillar reveal-element">
+                <div class="sticker-float">💖</div>
+                <div class="pillar-icon">🤝</div>
+                <h3 class="pillar-title">Community</h3>
+                <p class="pillar-desc">A highly loyal inner circle based on deep respect, inside jokes, and safety.</p>
+            </div>
+        </div>
+        <div class="global-panel-footer">Section III / Architecture Matrix</div>
+    </section>
+
+
+    <!-- ==========================================
+         PAGE 4 — PHOTO MEMORY PAGE
+         ========================================== -->
+    <section class="celebration-panel" id="gallery-panel">
+        <h2 class="cinematic-title reveal-element">Visual Artifacts</h2>
+        <p class="subtitle-premium reveal-element">Captured moments within the production timeline</p>
+
+        <div class="gallery-grid">
+            <div class="gallery-item gallery-item-wide reveal-element">
+                <!-- REPLACE: 'GALLERY_IMAGE_1_PLACEHOLDER' with horizontal live or setup capture -->
+                <img src="IMG1.jpg' width='600' height='400' viewBox='0 0 600 400'><rect width='600' height='400' fill='%231e293b'/><text x='50%27 y='50%27 dominant-baseline='middle' text-anchor='middle' fill='%2364748b'>GALLERY_IMAGE_1_PLACEHOLDER</text></svg>" alt="Broadcast Grid Segment">
+                <div class="gallery-overlay"><h4>Stream Stage Architecture</h4></div>
+            </div>
+            <div class="gallery-item reveal-element">
+                <img src="IMG2.jpg' width='400' height='400' viewBox='0 0 400 400'><rect width='400' height='400' fill='%230f172a'/><text x='50%27 y='50%27 dominant-baseline='middle' text-anchor='middle' fill='%23475569'>Aesthetic Still 1</text></svg>" alt="Broadcast Grid Segment">
+                <div class="gallery-overlay"><h4>Creative Core Ambient</h4></div>
+            </div>
+            <div class="gallery-item reveal-element">
+                <img src="IMG3.jpg' width='400' height='400' viewBox='0 0 400 400'><rect width='400' height='400' fill='%230f172a'/><text x='50%27 y='50%27 dominant-baseline='middle' text-anchor='middle' fill='%23475569'>Aesthetic Still 2</text></svg>" alt="Broadcast Grid Segment">
+                <div class="gallery-overlay"><h4>Late Night Broadcast Tone</h4></div>
+            </div>
+            <div class="gallery-item gallery-item-wide reveal-element">
+                <img src="IMG1.jpg' width='600' height='400' viewBox='0 0 600 400'><rect width='600' height='400' fill='%231e293b'/><text x='50%27 y='50%27 dominant-baseline='middle' text-anchor='middle' fill='%2364748b'>Aesthetic Still 3</text></svg>" alt="Broadcast Grid Segment">
+                <div class="gallery-overlay"><h4>Milestone Horizon Snapshot</h4></div>
+            </div>
+        </div>
+        <div class="global-panel-footer">Section IV / Frame Ledger</div>
+    </section>
+
+
+    <!-- ==========================================
+         PAGE 5 — FAN ENERGY PAGE
+         ========================================== -->
+    <section class="celebration-panel" id="fan-panel">
+        <h2 class="cinematic-title reveal-element">Community Signal</h2>
+        <p class="subtitle-premium reveal-element">Direct feedback from live interface logs</p>
+
+        <div class="testimonials-track">
+            <div class="glass-card fan-bubble reveal-element">
+                <div class="fan-avatar">U1</div>
+                <div class="fan-message">
+                    "Your streams are literally the absolute highlight of my entire week. The level of positive energy and inclusion you bring out is impossible to match!"
+                    <span class="fan-author">— Active Chat Node / Subscriber</span>
+                </div>
+            </div>
+            <div class="glass-card fan-bubble reveal-element" style="margin-left: 40px;">
+                <div class="fan-avatar" style="background: var(--accent-glow); color:#000;">U2</div>
+                <div class="fan-message">
+                    "Watching your content evolve from the early milestones to this incredible 2.49K mark has been inspirational. Your work ethic is unreal!"
+                    <span class="fan-author">— Loyal Moderator Group</span>
+                </div>
+            </div>
+            <div class="glass-card fan-bubble reveal-element">
+                <div class="fan-avatar">U3</div>
+                <div class="fan-message">
+                    "Authentic, extremely funny, and uniquely brilliant. Here from the start and definitely staying until the millions arrive."
+                    <span class="fan-author">— Discord Community Anchor</span>
+                </div>
+            </div>
+        </div>
+        <div class="global-panel-footer">Section V / Response Telemetry</div>
+    </section>
+
+
+    <!-- ==========================================
+         PAGE 6 — ACHIEVEMENTS PAGE
+         ========================================== -->
+    <section class="celebration-panel" id="achieve-panel">
+        <h2 class="cinematic-title reveal-element">Performance Ledger</h2>
+        <p class="subtitle-premium reveal-element">Quantifiable achievements verified</p>
+
+        <div class="stats-showcase">
+            <div class="glass-card stat-badge-card reveal-element">
+                <div class="stat-icon-plate">🎯</div>
+                <div>
+                    <div class="stat-num">2,490</div>
+                    <div class="stat-label">Active Subscriptions</div>
+                </div>
+            </div>
+            <div class="glass-card stat-badge-card reveal-element">
+                <div class="stat-icon-plate">❤️</div>
+                <div>
+                    <div class="stat-num">100%</div>
+                    <div class="stat-label">Community Affinity Rating</div>
+                </div>
+            </div>
+            <div class="glass-card stat-badge-card reveal-element">
+                <div class="stat-icon-plate">🔥</div>
+                <div>
+                    <div class="stat-num">Unstoppable</div>
+                    <div class="stat-label">Streaming Consistency Index</div>
+                </div>
+            </div>
+            <div class="glass-card stat-badge-card reveal-element">
+                <div class="stat-icon-plate">🚀</div>
+                <div>
+                    <div class="stat-num">5.0K Next</div>
+                    <div class="stat-label">Imminent Horizon Target</div>
+                </div>
+            </div>
+        </div>
+        <div class="global-panel-footer">Section VI / Performance Metrics</div>
+    </section>
+
+
+    <!-- ==========================================
+         PAGE 7 — YOUTUBE CHANNEL SHOWCASE
+         ========================================== -->
+    <section class="celebration-panel" id="yt-panel">
+        <h2 class="cinematic-title reveal-element">Platform Architecture</h2>
+        <p class="subtitle-premium reveal-element">Live UI Simulation Blueprint</p>
+
+        <div class="yt-mockup reveal-element">
+            <!-- REPLACE: 'YOUTUBE_BANNER_PLACEHOLDER' with premium abstract channel banner banner asset -->
+            <div class="yt-banner" style="background-image: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)), url('Banner.jpg' width=\'900\' height=\'180\'><rect width=\'900\' height=\'180\' fill=\'%231e293b\'/><text x=\'50%\' y=\'50%\' fill=\'%23475569\' text-anchor=\'middle\'>YOUTUBE_BANNER_PLACEHOLDER</text></svg>');"></div>
+            <div class="yt-header-bar">
+                <div class="yt-pfp-container">
+                    <!-- REPLACE: 'YOUTUBE_AVATAR_PLACEHOLDER' with matching clean avatar logo image -->
+                    <img src="Avatar.jpg' width='100' height='100' viewBox='0 0 100 100'><rect width='100' height='100' fill='%2338bdf8'/></svg>" alt="Creator Avatar Profile">
+                </div>
+                <div class="yt-meta-info">
+                    <h3>Your Channel Concept</h3>
+                    <p>@creatorhandle • <b>2.49K subscribers</b> • Active Video Catalog</p>
+                </div>
+            </div>
+            <div class="yt-videos-grid">
+                <div class="yt-video-thumb">
+                    <div class="thumb-img-wrapper">
+                        <!-- REPLACE: 'GALLERY_IMAGE_2_PLACEHOLDER' with thumbnail snapshot layout -->
+                        <img src="IMG1.jpg' width='300' height='170'><rect width='300' height='170' fill='%230f172a'/><text x='50%\' y='50%\' fill='%23334155\' text-anchor=\'middle\'>GALLERY_IMAGE_2_PLACEHOLDER</text></svg>" alt="Video Cover Frame">
                     </div>
+                    <div class="thumb-title">MAKING MONUMENTAL CREATIVE WAVES // ROAD TO 2.49K CELEBRATION LIVE TRACK</div>
                 </div>
-            </div>
-            
-            <p style="font-size: 0.85rem; opacity: 0.6; margin-top: 1.5rem;">
-                <span class="secret-hover" data-secret="You put so much effort into your broadcasts, and seeing you scale to 1,600+ communities makes me so incredibly proud. Keep crushing it!">💡 Hover here for a hidden creator message from your friend.</span>
-            </p>
-        </div>
-    </section>
-
-    <!-- ========================================================= -->
-    <!-- PAGE 4: INTERACTIVE DRAGGABLE MEMORY WALL                 -->
-    <!-- ========================================================= -->
-    <section class="page" id="page-gallery">
-        <div class="glass-card" style="max-width: 1000px;">
-            <h2 class="gradient-text" style="font-size: 2.2rem; margin-bottom: 0.5rem;">Interactive Scrapbook Wall</h2>
-            <p style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 2rem;">Click and drag these custom canvas frames around to rearrange your layout memory space.</p>
-            
-            <div class="polaroid-canvas" id="draggable-zone">
-                <!-- Polaroid Frame 1 -->
-                <div class="polaroid-drag" style="top: 40px; left: 40px; transform: rotate(-5deg);">
-                    <div class="img-placeholder">
-                        <div class="placeholder-img" style="font-size:0.65rem; padding:10px;">[ Photo Layer ]</div>
+                <div class="yt-video-thumb">
+                    <div class="thumb-img-wrapper">
+                        <img src="IMG2.jpg' width='300' height='170'><rect width='300' height='170' fill='%230f172a'/></svg>" alt="Video Cover Frame">
                     </div>
-                    <p>Streamer Queen 👑</p>
+                    <div class="thumb-title">HIGH INTENSITY MECHANICAL GAMING DEPTHS — SEASON SYSTEM CLIMB</div>
                 </div>
-
-                <!-- Polaroid Frame 2 -->
-                <div class="polaroid-drag" style="top: 80px; right: 60px; transform: rotate(7deg);">
-                    <div class="img-placeholder">
-                        <div class="placeholder-img" style="font-size:0.65rem; padding:10px;">[ Photo Layer ]</div>
+                <div class="yt-video-thumb">
+                    <div class="thumb-img-wrapper">
+                        <img src="IMG3.jpg' width='300' height='170'><rect width='300' height='170' fill='%230f172a'/></svg>" alt="Video Cover Frame">
                     </div>
-                    <p>1.6K Strong 🚀</p>
-                </div>
-
-                <!-- Polaroid Frame 3 -->
-                <div class="polaroid-drag" style="bottom: 30px; left: 30%; transform: rotate(-2deg);">
-                    <div class="img-placeholder">
-                        <div class="placeholder-img" style="font-size:0.65rem; padding:10px;">[ Photo Layer ]</div>
-                    </div>
-                    <p>Proud of You ✨</p>
+                    <div class="thumb-title">COMMUNITY Q&A SESSIONS: INSIDE LOGIC, COLD FACTS & REVEALS</div>
                 </div>
             </div>
         </div>
+
+        <a href="https://www.youtube.com/@PENGLOW19" target="_blank" class="btn-icy-glow reveal-element" style="margin-top: 40px; border-color: #ef4444; box-shadow: 0 0 20px rgba(239,68,68,0.15);">
+            Visit Channel <span>📺</span>
+        </a>
+        <div class="global-panel-footer">Section VII / Platform Blueprint</div>
     </section>
 
-    <!-- ========================================================= -->
-    <!-- PAGE 5: FRIENDSHIP TIMELINE MATRIX                       -->
-    <!-- ========================================================= -->
-    <section class="page" id="page-timeline">
-        <div class="glass-card">
-            <h2 class="gradient-text" style="font-size: 2.2rem; margin-bottom: 2rem;">Our Shared Roadmap Journey</h2>
-            
-            <div class="timeline">
-                <div class="timeline-item">
-                    <div class="timeline-date">THE STARTING POINT</div>
-                    <div class="timeline-title">When We First Connected 🤝</div>
-                    <div class="timeline-desc">Instant friendship synchronization. Two absolute nerds figuring out life, games, and streaming together.</div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-date">THE BROKEN STREAM BENCHMARKS</div>
-                    <div class="timeline-title">First Streams & Hard Work 🎙️</div>
-                    <div class="timeline-desc">Watching you customize layouts, test sound mechanics, and push through technical issues to drop pure high-grade content.</div>
-                </div>
-                <div class="timeline-item">
-                    <div class="timeline-date">THE PRESENT DAY PLATFORM ACHIEVEMENT</div>
-                    <div class="timeline-title">Reaching 1,600+ Active Subscribers 🏆</div>
-                    <div class="timeline-desc">The undeniable proof that your talent, dedication, and amazing personality resonate globally. This milestone belongs to you completely.</div>
-                </div>
+
+    <!-- ==========================================
+         PAGE 8 — SPECIAL MOMENTS PAGE
+         ========================================== -->
+    <section class="celebration-panel" id="moments-panel">
+        <h2 class="cinematic-title reveal-element">Scrapbook Vault</h2>
+        <p class="subtitle-premium reveal-element">Protected memory segments</p>
+
+        <div class="scrapbook-layout">
+            <div class="scrapbook-frame-container reveal-element">
+                <!-- REPLACE: 'SCRAPBOOK_IMAGE_PLACEHOLDER' with physical asset memory polaroid or candid framing -->
+                <img src="data:IMG1.jpg' width='350' height='400' viewBox='0 0 350 400'><rect width='350' height='400' fill='%23cbd5e1'/><text x='50%27 y='50%27 fill='%23475569%27 text-anchor='middle'>SCRAPBOOK_IMAGE_PLACEHOLDER</text></svg>" alt="Polaroid Memory Display" class="scrapbook-photo">
+                <div class="scrapbook-caption">Slowing Down Time.</div>
+            </div>
+            <div class="scrapbook-narrative reveal-element">
+                <p>Behind the analytical performance counters, subscriber updates, and interface mechanics lie the authentic memories that construct this timeline.</p>
+                <p style="margin-top: 15px;">Every stream kickoff, unexpected chat burst, deep late-night production challenge, and triumphant milestone victory has forged an enduring legacy.</p>
             </div>
         </div>
+        <div class="global-panel-footer">Section VIII / Memory Matrix</div>
     </section>
 
-    <!-- ========================================================= -->
-    <!-- PAGE 6: AUDIO REACTION VIBES SYNC MATRIX                 -->
-    <!-- ========================================================= -->
-    <section class="page" id="page-music-vibes">
-        <div class="glass-card">
-            <h2 class="gradient-text" style="font-size: 2.2rem; margin-bottom: 1rem;">Nostalgic Background Waves</h2>
-            <p style="max-width: 550px; margin: 0 auto; font-size: 0.95rem; opacity: 0.85; line-height: 1.6;">
-                Music builds the foundations of memory spaces. This environment syncs seamlessly to relaxed lo-fi arrangements to elevate your personal birthday reading scroll.
-            </p>
+
+    <!-- ==========================================
+         PAGE 9 — FUTURE & DREAMS PAGE
+         ========================================== -->
+    <section class="celebration-panel" id="future-panel">
+        <div class="cosmic-vision-box">
+            <h2 class="cinematic-title reveal-element">Next Horizon Vector</h2>
+            <p class="subtitle-premium reveal-element">Mapping macro-level expansion pipelines</p>
             
-            <div class="vibe-visualizer-container" id="vibe-visualizer">
-                <!-- Populated dynamically via functional iteration engine updates -->
+            <h3 class="reveal-element" style="font-family: var(--font-cinzel); font-size: 2rem; letter-spacing: 0.1rem; line-height: 1.4; margin-top: 20px;">
+                “Next Stop: Bigger Dreams & Millions Ahead”
+            </h3>
+            
+            <div class="space-concept-track reveal-element">
+                <div class="space-progress-line"></div>
+                <div class="rocket-node-penguin">🚀</div>
             </div>
-            
-            <p style="font-size: 0.85rem; font-style: italic; opacity: 0.7;">
-                "Every milestone achieved is just another track on a beautiful compilation disc..."
-            </p>
+            <p style="margin-top: 30px; color: var(--text-secondary);" class="reveal-element">The network architecture is fully primed. 2.49K forms the perfect solid runway launchpad — the trajectory from here points straight up into the outer atmosphere.</p>
         </div>
+        <div class="global-panel-footer">Section IX / Vector Analysis</div>
     </section>
 
-    <!-- ========================================================= -->
-    <!-- PAGE 7: FUN INTERACTIVE CLICK EXPLOSION HUB              -->
-    <!-- ========================================================= -->
-    <section class="page" id="page-interactive">
-        <div class="glass-card">
-            <h2 class="gradient-text" style="font-size: 2.2rem; margin-bottom: 0.5rem;">Interactive Celebration Panel</h2>
-            <p style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 2rem;">Click the modular elements below to trigger real-time canvas explosion vectors.</p>
+
+    <!-- ==========================================
+         PAGE 10 — FINAL MESSAGE PAGE
+         ========================================== -->
+    <section class="celebration-panel" id="final-panel">
+        <div class="emotional-letter-container glass-card">
+            <div class="typing-writer-surface" id="typedTarget"></div>
             
-            <div class="interaction-grid">
-                <div class="interactive-tile" onclick="triggerConfettiBurst()">
-                    <div class="tile-icon">🎉</div>
-                    <div style="font-weight:600; font-size:0.95rem; margin-bottom:4px;">Confetti Burst</div>
-                    <div style="font-size:0.75rem; opacity:0.6;">Deploy side-angle streamers</div>
-                </div>
-                <div class="interactive-tile" onclick="triggerHeartBurst()">
-                    <div class="tile-icon">💝</div>
-                    <div style="font-weight:600; font-size:0.95rem; margin-bottom:4px;">Heart Matrix</div>
-                    <div style="font-size:0.75rem; opacity:0.6;">Spread pure supportive energy</div>
-                </div>
-                <div class="interactive-tile" onclick="triggerMultiFireworks()">
-                    <div class="tile-icon">✨</div>
-                    <div style="font-weight:600; font-size:0.95rem; margin-bottom:4px;">Sky Firework</div>
-                    <div style="font-size:0.75rem; opacity:0.6;">Light up spatial vectors</div>
-                </div>
+            <div class="closing-tagline reveal-element" id="finalClosingTag">
+                Made with pride and support ❤️
             </div>
         </div>
+        <div class="global-panel-footer">Section X / Permanent Archives</div>
     </section>
 
-    <!-- ========================================================= -->
-    <!-- PAGE 8: HANDWRITTEN EMOTIONAL MEMORANDUM                  -->
-    <!-- ========================================================= -->
-    <section class="page" id="page-letter">
-        <div class="glass-card">
-            <h2 class="gradient-text" style="font-size: 2.2rem; margin-bottom: 2rem;">A Letter For My Friend 📝</h2>
-            
-            <div class="handwritten-letter">
-                Dear Penglow,<br><br>
-                It is rare to cross paths with someone who matches your frequency so naturally. You are an incredibly genuine person, an absolute powerhouse of a creator, and most importantly, an irreplaceable presence in my life.<br><br>
-                Watching you grow your community and step into your role as the <span class="secret-hover" data-secret="Seriously, you make streaming look like art. Your community loves you for exactly who you are.">"Best Streamer"</span> has been an absolute privilege. Never doubt your impact or your talent.<br><br>
-                May this year bring you all the love, metrics, success, and joy that you completely deserve. Happy Birthday!<br><br>
-                Your Close Friend Always ✨
-            </div>
-        </div>
-    </section>
 
-    <!-- ========================================================= -->
-    <!-- PAGE 9: CINEMATIC SLIDESHOW PRESENTATION                 -->
-    <!-- ========================================================= -->
-    <section class="page" id="page-slideshow">
-        <div class="glass-card">
-            <h2 class="gradient-text" style="font-size: 2.2rem; margin-bottom: 0.5rem;">Memories Display Deck</h2>
-            <p style="font-size: 0.9rem; opacity: 0.7; margin-bottom: 1rem;">Slow-exposure transitions curated to preserve milestones.</p>
-            
-            <div class="slideshow-window">
-                <!-- Slide Item 1 -->
-                <div class="slide active">
-                    <div class="placeholder-img" style="height:100%;">
-                        <svg viewBox="0 0 24 24" style="width:60px; height:60px;"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 5H5l3.5-4.5z"/></svg>
-                        <span style="font-size:0.85rem; margin-top:10px;">[ Asset Slot: Stream Launch Capture ]</span>
-                    </div>
-                    <div class="slide-caption">
-                        <h3 style="color: var(--primary);">Day One Mechanics</h3>
-                        <p style="font-size:0.8rem; opacity:0.9;">Building the stream identity layer by layer.</p>
-                    </div>
-                </div>
-
-                <!-- Slide Item 2 -->
-                <div class="slide">
-                    <div class="placeholder-img" style="height:100%; background: linear-gradient(45deg, #381e3d, #140d24);">
-                        <svg viewBox="0 0 24 24" style="width:60px; height:60px;"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 5H5l3.5-4.5z"/></svg>
-                        <span style="font-size:0.85rem; margin-top:10px;">[ Asset Slot: Milestones Celebrations ]</span>
-                    </div>
-                    <div class="slide-caption">
-                        <h3 style="color: var(--accent-glow);">1.6K Subscribers Hit!</h3>
-                        <p style="font-size:0.8rem; opacity:0.9;">An entire theater filling up to watch your broadcasts.</p>
-                    </div>
-                </div>
-            </div>
-
-            <p style="font-family: var(--font-fancy); font-size: 1.6rem; color: var(--primary); margin-top: 1rem;">
-                “No matter how far you go… I’ll always be cheering for you ❤️”
-            </p>
-        </div>
-    </section>
-
-    <!-- ========================================================= -->
-    <!-- PAGE 10: GRAND FINALE CLIMAX SYSTEM                      -->
-    <!-- ========================================================= -->
-    <section class="page" id="page-finale">
-        <div class="glass-card" style="border: 2px solid var(--primary); background: rgba(22, 11, 36, 0.85);">
-            <h2 class="gradient-text" style="font-size: 3rem; margin-bottom: 0.5rem; letter-spacing:-1px;">HAPPY BIRTHDAY PENGLOW 🎂</h2>
-            <p style="font-weight: 600; color: var(--accent-glow); font-size:1.1rem; margin-bottom: 2rem;">Our Favorite Streamer & Best Friend</p>
-            
-            <div class="cake-container" onclick="igniteCakeClimax()" id="interactive-cake-target">
-                <div class="flame-particle" id="cake-flame">🔥</div>
-                <div class="cake-graphic">🎂</div>
-            </div>
-
-            <br>
-            <button class="btn-cinematic" id="cut-cake-cta" onclick="igniteCakeClimax()" style="background: linear-gradient(135deg, #ffb7da 0%, #b39ddb 100%); color:#000;">Cut the Cake 🎉</button>
-            
-            <p style="font-size: 0.85rem; opacity: 0.6; margin-top: 2rem; max-width:500px; margin-left:auto; margin-right:auto;">
-                Clicking the cake or trigger button sets off the environmental audio transition matrix alongside intense vector celebratory patterns.
-            </p>
-        </div>
-    </section>
-
-    <!-- ========================================================= -->
-    <!-- RUNTIME ENGINE ARCHITECTURE (JAVASCRIPT / THREE.JS / GSAP)-->
-    <!-- ========================================================= -->
+    <!-- ==========================================
+         JAVASCRIPT ENGINES & MOTION LOGIC
+         ========================================== -->
     <script>
-        /* REGISTER GSAP TRIGGER EXTENSIONS */
-        gsap.registerPlugin(ScrollTrigger);
-
-        /* --------------------------------------------------------- */
-        /* SITE TIMELINE PRELOADER MANAGEMENT ENGINE                  */
-        /* --------------------------------------------------------- */
-        window.addEventListener('DOMContentLoaded', () => {
-            const progress = document.getElementById('load-progress-bar');
-            gsap.to(progress, {
-                width: '100%',
-                duration: 1.5,
-                ease: 'power2.inOut',
-                onComplete: () => {
-                    gsap.to('#loader', {
-                        opacity: 0,
-                        duration: 0.6,
-                        display: 'none',
-                        onComplete: () => { initScrollAnimations(); }
-                    });
-                }
-            });
-            buildDynamicVibeVisualizer();
-            initDragAndDropPolaroids();
-        });
-
-        /* GLOBAL SCROLL EVENT MANAGER */
-        function scrollToPage(selector) {
-            document.querySelector(selector).scrollIntoView({ behavior: 'smooth' });
-        }
-
-        /* --------------------------------------------------------- */
-        /* THREE.JS GLOBAL PARTICLE FIELD GENERATION MECHANISM        */
-        /* --------------------------------------------------------- */
-        const canvas = document.getElementById('three-canvas');
-        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.z = 30;
-
-        // Formulate procedural spatial geometry structure
-        const particleCount = 180;
-        const geometry = new THREE.BufferGeometry();
-        const positions = new Float32Array(particleCount * 3);
-        const randomScales = new Float32Array(particleCount);
-
-        for(let i=0; i<particleCount*3; i+=3) {
-            positions[i] = (Math.random() - 0.5) * 60;   // X Coordinate Spatial Mapping
-            positions[i+1] = (Math.random() - 0.5) * 60; // Y Coordinate Spatial Mapping
-            positions[i+2] = (Math.random() - 0.5) * 40; // Z Coordinate Spatial Mapping
-            randomScales[i/3] = Math.random();
-        }
-
-        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-
-        // Design modern procedural gradient glowing particle textures
-        const pMaterial = new THREE.PointsMaterial({
-            color: 0xffb7da,
-            size: 0.6,
-            transparent: true,
-            opacity: 0.6,
-            blending: THREE.AdditiveBlending
-        });
-
-        const starField = new THREE.Points(geometry, pMaterial);
-        scene.add(starField);
-
-        // Track system coordinate movements cleanly via mouse tracking mechanisms
-        let mouseX = 0, mouseY = 0;
-        window.addEventListener('mousemove', (e) => {
-            mouseX = (e.clientX / window.innerWidth) - 0.5;
-            mouseY = (e.clientY / window.innerHeight) - 0.5;
-            generateSparkleElement(e.clientX, e.clientY);
-        });
-
-        // Continuous rendering animation matrix updates
-        function renderLoop() {
-            requestAnimationFrame(renderLoop);
-            starField.rotation.y += 0.0015;
-            starField.rotation.x += 0.0008;
+        document.addEventListener("DOMContentLoaded", () => {
             
-            // Integrate subtle ease-interpolated parallax tracking alignments
-            starField.position.x += (mouseX * 4 - starField.position.x) * 0.05;
-            starField.position.y += (-mouseY * 4 - starField.position.y) * 0.05;
-            
-            renderer.render(scene, camera);
-        }
-        renderLoop();
-
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-
-        /* --------------------------------------------------------- */
-        /* MOUSE SPARKLES EFFECT GENERATOR                           */
-        /* --------------------------------------------------------- */
-        const overlay = document.getElementById('sparkle-overlay');
-        function generateSparkleElement(x, y) {
-            if (Math.random() > 0.15) return; // Restrict output rates to limit DOM performance drag
-            const sp = document.createElement('div');
-            sp.innerText = ['✨', '🌸', '💖', '⭐'][Math.floor(Math.random() * 4)];
-            sp.style.position = 'absolute';
-            sp.style.left = x + 'px';
-            sp.style.top = y + 'px';
-            sp.style.pointerEvents = 'none';
-            sp.style.fontSize = (Math.random() * 12 + 10) + 'px';
-            sp.style.zIndex = '9999';
-            overlay.appendChild(sp);
-
-            gsap.to(sp, {
-                y: sp.offsetTop - (Math.random() * 60 + 20),
-                x: sp.offsetLeft + (Math.random() * 40 - 20),
-                opacity: 0,
-                duration: 1 + Math.random(),
-                onComplete: () => sp.remove()
-            });
-        }
-
-        /* --------------------------------------------------------- */
-        /* GSAP SCROLL-TRIGGERED SCENE ANIMATIONS TRANSITIONS ENGINE  */
-        /* --------------------------------------------------------- */
-        function initScrollAnimations() {
-            // Animate Introduction Entrance Layout Blocks Accurately
-            gsap.to("#intro-card", { opacity: 1, y: 0, duration: 1.2, ease: "power4.out" });
-
-            // Apply global cascading scroll intercept reveals across target glass-cards
-            document.querySelectorAll('.glass-card').forEach((card) => {
-                if (card.id === 'intro-card') return; // Bypass first element cards
-                gsap.from(card, {
-                    scrollTrigger: {
-                        trigger: card,
-                        start: "top 85%",
-                        toggleActions: "play none none none"
-                    },
-                    opacity: 0,
-                    y: 50,
-                    scale: 0.98,
-                    duration: 1,
-                    ease: "power3.out"
-                });
-            });
-
-            // Initialize structural counters when subscriber component breaches focus fields
-            gsap.fromTo("#sub-counter", 
-                { textContent: 0 },
-                { 
-                    textContent: 1600, 
-                    duration: 3, 
-                    ease: "power2.out",
-                    scrollTrigger: {
-                        trigger: "#page-streamer",
-                        start: "top 70%"
-                    },
-                    snap: { textContent: 1 },
-                    onUpdate: function() {
-                        document.getElementById('sub-counter').innerHTML = Math.floor(this.targets()[0].textContent) + "<span style='color:var(--primary); font-size:2.5rem;'>.0</span>";
-                    }
-                }
-            );
-
-            // Execute automated streaming live-chat timeline injectors upon visibility entry
-            let chatTriggered = false;
-            ScrollTrigger.create({
-                trigger: "#page-streamer",
-                start: "top 60%",
-                onEnter: () => {
-                    if(!chatTriggered) {
-                        chatTriggered = true;
-                        executeSimulatedLiveChatStream();
-                    }
-                }
-            });
-
-            // Launch Cinematic Slideshow Loop Sequencer Configuration
-            initCinematicSlideshowLoop();
-        }
-
-        /* --------------------------------------------------------- */
-        /* SIMULATED STREAMER LIVE CHAT PARSING DATA FEED REPLICATOR */
-        /* --------------------------------------------------------- */
-        const simulatedChatLogs = [
-            { user: "GamerVibe_99", text: "HAPPY BIRTHDAY PENGLOW!!! 🎉🎂", class: "sub" },
-            { user: "StarShield", text: "1.6K SUBS YOOOOO! PROUD OF YOU! 🚀🚀", class: "mod" },
-            { user: "Your_Best_Friend", text: "To my absolute favorite human, happy birthday! ❤️👑", class: "friend" },
-            { user: "LofiListener", text: "Best streamer on the platform hands down 🙌", class: "sub" },
-            { user: "CozyCloud", text: "The vibes are immaculate tonight! HBD! ✨🌸", class: "standard" },
-            { user: "StreamSniperFriendly", text: "1.6k strong community let's gooooo! 📈", class: "sub" },
-            { user: "PixelHeart", text: "Happy birthday queen! Thanks for always making us smile!", class: "mod" }
-        ];
-
-        function executeSimulatedLiveChatStream() {
-            const container = document.getElementById('live-chat-container');
-            let idx = 0;
-
-            function injectNextMessage() {
-                if (idx >= simulatedChatLogs.length) return;
-                const log = simulatedChatLogs[idx];
-                
-                const line = document.createElement('div');
-                line.className = 'chat-line';
-                
-                let badge = "";
-                if(log.class === 'mod') badge = "🛡️ ";
-                if(log.class === 'sub') badge = "👑 ";
-                if(log.class === 'friend') badge = "💖 ";
-
-                line.innerHTML = `<span class="chat-user ${log.class}">${badge}${log.user}:</span><span class="chat-text">${log.text}</span>`;
-                container.appendChild(line);
-                container.scrollTop = container.scrollHeight;
-
-                idx++;
-                setTimeout(injectNextMessage, 1200 + Math.random() * 800);
-            }
-            injectNextMessage();
-        }
-
-        /* --------------------------------------------------------- */
-        /* HTML5 DRAG-AND-DROP SCRAPBOOK PLACEMENT ENGINE            */
-        /* --------------------------------------------------------- */
-        function initDragAndDropPolaroids() {
-            const container = document.getElementById('draggable-zone');
-            const cards = document.querySelectorAll('.polaroid-drag');
-
-            cards.forEach(card => {
-                let isDragging = false;
-                let offsetX = 0, offsetY = 0;
-
-                card.addEventListener('mousedown', (e) => {
-                    isDragging = true;
-                    // Compute positional offsets cleanly relative to structural mouse footprints
-                    offsetX = e.clientX - card.getBoundingClientRect().left;
-                    offsetY = e.clientY - card.getBoundingClientRect().top;
-                    card.style.zIndex = "1000";
-                });
-
-                document.addEventListener('mousemove', (e) => {
-                    if (!isDragging) return;
-                    const containerRect = container.getBoundingClientRect();
+            // --- 1. PREMIUM INITIALIZATION LOADER DISMISSAL ---
+            window.addEventListener("load", () => {
+                const loader = document.getElementById("loader");
+                setTimeout(() => {
+                    loader.style.opacity = "0";
+                    loader.style.transform = "scale(1.05)";
+                    setTimeout(() => loader.style.display = "none", 1000);
                     
-                    // Constrain item movements inside bounds boundaries safely
-                    let newX = e.clientX - containerRect.left - offsetX;
-                    let newY = e.clientY - containerRect.top - offsetY;
+                    // Trigger custom visual effects pipeline instantly on opening
+                    triggerConfettiCelebration();
+                }, 2000);
+            });
 
-                    // Bound constraints logic checks
-                    newX = Math.max(0, Math.min(newX, containerRect.width - card.offsetWidth));
-                    newY = Math.max(0, Math.min(newY, containerRect.height - card.offsetHeight));
+            // --- 2. SMOOTH SCROLL DISPLAY INTERSECTION DETECTOR ---
+            const revealElements = document.querySelectorAll(".reveal-element");
+            const navDots = document.querySelectorAll(".nav-dot");
+            const panels = document.querySelectorAll(".celebration-panel");
 
-                    card.style.left = newX + 'px';
-                    card.style.top = newY + 'px';
-                });
-
-                document.addEventListener('mouseup', () => {
-                    if(isDragging) {
-                        isDragging = false;
-                        card.style.zIndex = "10";
+            const revealObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if(entry.isIntersecting) {
+                        entry.target.classList.add("active-reveal");
+                        
+                        // Special action trigger for final page typewriter execution
+                        if(entry.target.id === "final-panel") {
+                            startEmotionalTypewriter();
+                        }
                     }
                 });
+            }, { threshold: 0.15 });
 
-                // Mobile Touch Adaptations
-                card.addEventListener('touchstart', (e) => {
-                    isDragging = true;
-                    const touch = e.touches[0];
-                    offsetX = touch.clientX - card.getBoundingClientRect().left;
-                    offsetY = touch.clientY - card.getBoundingClientRect().top;
+            revealElements.forEach(el => revealObserver.observe(el));
+
+            // Sync navigation dots state machine to viewport position
+            const panelObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if(entry.isIntersecting) {
+                        navDots.forEach(dot => {
+                            dot.classList.toggle("active", dot.getAttribute("data-target") === entry.target.id);
+                        });
+                    }
                 });
+            }, { threshold: 0.5 });
 
-                document.addEventListener('touchmove', (e) => {
-                    if (!isDragging) return;
-                    const touch = e.touches[0];
-                    const containerRect = container.getBoundingClientRect();
-                    let newX = touch.clientX - containerRect.left - offsetX;
-                    let newY = touch.clientY - containerRect.top - offsetY;
-                    newX = Math.max(0, Math.min(newX, containerRect.width - card.offsetWidth));
-                    newY = Math.max(0, Math.min(newY, containerRect.height - card.offsetHeight));
-                    card.style.left = newX + 'px';
-                    card.style.top = newY + 'px';
+            panels.forEach(p => panelObserver.observe(p));
+
+            // Attach active event handling to navigation dots
+            navDots.forEach(dot => {
+                dot.addEventListener("click", () => {
+                    const targetId = dot.getAttribute("data-target");
+                    document.getElementById(targetId).scrollIntoView({ behavior: 'smooth' });
                 });
-
-                document.addEventListener('touchend', () => { isDragging = false; });
             });
-        }
 
-        /* --------------------------------------------------------- */
-        /* STRUCTURAL MUSIC VIBE EQUALIZER RENDERER                  */
-        /* --------------------------------------------------------- */
-        function buildDynamicVibeVisualizer() {
-            const container = document.getElementById('vibe-visualizer');
-            const totalBars = 24;
-            for(let i=0; i<totalBars; i++) {
-                const bar = document.createElement('div');
-                bar.className = 'vibe-bar';
-                container.appendChild(bar);
+
+            // --- 3. CINEMATIC CURSOR INTERACTION GLOW OVERLAY ENGINE ---
+            const mouseGlow = document.getElementById("mouseGlow");
+            document.addEventListener("mousemove", (e) => {
+                mouseGlow.style.left = `${e.clientX}px`;
+                mouseGlow.style.top = `${e.clientY}px`;
+            });
+
+
+            // --- 4. SNOWFALL ATMOSPHERE PARTICULATES ENGINE (HTML5 CANVAS) ---
+            const canvas = document.getElementById("snowCanvas");
+            const ctx = canvas.getContext("2d");
+            let flakes = [];
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
             }
-        }
+            window.addEventListener("resize", resizeCanvas);
+            resizeCanvas();
 
-        let vibeInterval = null;
-        function animateVibeVisualizerElements(start) {
-            const bars = document.querySelectorAll('.vibe-bar');
-            if(!start) {
-                clearInterval(vibeInterval);
-                bars.forEach(b => b.style.height = '15px');
-                return;
+            class Flake {
+                constructor() { this.reset(); }
+                reset() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * -canvas.height;
+                    this.size = Math.random() * 2.5 + 0.8;
+                    this.speed = Math.random() * 1.5 + 0.5;
+                    this.velX = Math.random() * 0.5 - 0.25;
+                    this.opacity = Math.random() * 0.6 + 0.2;
+                }
+                update() {
+                    this.y += this.speed;
+                    this.x += this.velX;
+                    if (this.y > canvas.height) this.reset();
+                }
+                draw() {
+                    ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
             }
-            vibeInterval = setInterval(() => {
-                bars.forEach(bar => {
-                    const randomHeight = Math.random() * 65 + 10;
-                    bar.style.height = randomHeight + 'px';
-                });
-            }, 120);
-        }
 
-        /* --------------------------------------------------------- */
-        /* AUDIO MANAGEMENT SUB-ROUTINE HARD CODED FALLBACKS         */
-        /* --------------------------------------------------------- */
-        const playPauseBtn = document.getElementById('play-pause-btn');
-        const mainVisualizer = document.getElementById('main-visualizer');
-        let audioPlaying = false;
+            for(let i=0; i < 110; i++) flakes.push(new Flake());
 
-        // Initialize high-grade audio synthesizer structure inside environment context
-        // This ensures fully compliant procedural background audio functionality without heavy external media assets
-        const AudioContext = window.AudioContext || window.webkitAudioContext;
-        let audioCtx = null;
-        let oscillator = null;
-        let gainNode = null;
-
-        function startProceduralLofiSynthesis() {
-            if(!audioCtx) {
-                audioCtx = new AudioContext();
-                oscillator = audioCtx.createOscillator();
-                gainNode = audioCtx.createGain();
-                
-                // Formulate ultra-warm lofi analog textures (triangle patterns)
-                oscillator.type = 'triangle';
-                oscillator.frequency.setValueAtTime(220, audioCtx.currentTime); // Soft structural A3 root warm frequency tone
-                
-                // Set low-amplitude ambient safety levels
-                gainNode.gain.setValueAtTime(0.04, audioCtx.currentTime); 
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-                oscillator.start();
-            } else {
-                audioCtx.resume();
+            function renderAtmosphere() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                flakes.forEach(f => { f.update(); f.draw(); });
+                requestAnimationFrame(renderAtmosphere);
             }
-        }
+            renderAtmosphere();
 
-        function stopProceduralLofiSynthesis() {
-            if(audioCtx) { audioCtx.suspend(); }
-        }
 
-        playPauseBtn.addEventListener('click', () => {
-            audioPlaying = !audioPlaying;
-            if(audioPlaying) {
-                playPauseBtn.innerText = "⏸";
-                mainVisualizer.classList.add('playing');
-                animateVibeVisualizerElements(true);
-                startProceduralLofiSynthesis();
-            } else {
-                playPauseBtn.innerText = "▶";
-                mainVisualizer.classList.remove('playing');
-                animateVibeVisualizerElements(false);
-                stopProceduralLofiSynthesis();
+            // --- 5. AUDIO MANAGEMENT HOOKS ---
+            const audioToggle = document.getElementById("audioToggle");
+            let audioCtx = null;
+            let ambientOscillator = null; 
+            let soundPlaying = false;
+
+            // Synthesis of cinematic ambient soundscape safely to avoid external assets block
+            function startAmbientSynth() {
+                if(!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    
+                    // Deep drone base layer
+                    ambientOscillator = audioCtx.createOscillator();
+                    const filter = audioCtx.createBiquadFilter();
+                    const gainNode = audioCtx.createGain();
+
+                    ambientOscillator.type = 'sine';
+                    ambientOscillator.frequency.setValueAtTime(75, audioCtx.currentTime); // Deep resonant frequency
+                    
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(120, audioCtx.currentTime);
+
+                    gainNode.gain.setValueAtTime(0.12, audioCtx.currentTime); // Keep soft and cinematic
+
+                    ambientOscillator.connect(filter);
+                    filter.connect(gainNode);
+                    gainNode.connect(audioCtx.destination);
+                    ambientOscillator.start();
+                } else {
+                    audioCtx.resume();
+                }
+            }
+
+            audioToggle.addEventListener("click", () => {
+                if(!soundPlaying) {
+                    startAmbientSynth();
+                    document.getElementById("audioOnIcon").style.fill = "var(--accent-glow)";
+                    soundPlaying = true;
+                } else {
+                    if(audioCtx) audioCtx.suspend();
+                    document.getElementById("audioOnIcon").style.fill = "var(--text-primary)";
+                    soundPlaying = false;
+                }
+            });
+
+
+            // --- 6. EASTER EGG WADDLE INTERACTIVE ALERTS ---
+            const secretPenguin = document.getElementById("secretPenguin");
+            const eggBubble = document.getElementById("eggBubble");
+
+            secretPenguin.addEventListener("click", () => {
+                eggBubble.classList.add("show");
+                
+                // Fire extra mini burst of custom localized snow sparkles on selection
+                for(let i=0; i<15; i++) {
+                    const extraSpark = new Flake();
+                    extraSpark.x = window.innerWidth - 50;
+                    extraSpark.y = window.innerHeight - 50;
+                    extraSpark.speed = Math.random() * -4 - 1;
+                    extraSpark.velX = Math.random() * -5;
+                    flakes.push(extraSpark);
+                }
+
+                setTimeout(() => {
+                    eggBubble.classList.remove("show");
+                }, 4500);
+            });
+
+
+            // --- 7. SCROLL-BASED MOVEMENT TRACKING FOOTPRINTS LAYER ---
+            let lastScrollPosition = 0;
+            let deltaAccumulator = 0;
+
+            window.addEventListener("scroll", () => {
+                const currentScroll = window.scrollY;
+                const delta = Math.abs(currentScroll - lastScrollPosition);
+                deltaAccumulator += delta;
+
+                // Drops a stylized footprint marker tracking along the viewport every 280px scrolled
+                if(deltaAccumulator > 280) {
+                    dropFootprintMarker(Math.random() * (window.innerWidth * 0.8) + (window.innerWidth * 0.1), window.scrollY + (window.innerHeight / 2));
+                    deltaAccumulator = 0;
+                }
+                lastScrollPosition = currentScroll;
+            });
+
+            function dropFootprintMarker(x, y) {
+                const marker = document.createElement("div");
+                marker.className = "footprint";
+                marker.style.left = `${x}px`;
+                marker.style.top = `${y}px`;
+                marker.style.transform = `rotate(${Math.random() * 30 - 15}deg) scale(0.9)`;
+                document.body.appendChild(marker);
+
+                // Elegant fade out tracking lifetime sequence
+                setTimeout(() => marker.style.opacity = "1", 50);
+                setTimeout(() => {
+                    marker.style.opacity = "0";
+                    marker.style.transform += " translateY(-10px)";
+                }, 2000);
+                setTimeout(() => marker.remove(), 3500);
+            }
+
+
+            // --- 8. OPENING SCREEN CONFETTI BURST SIMULATION ---
+            function triggerConfettiCelebration() {
+                for(let i=0; i < 40; i++) {
+                    setTimeout(() => {
+                        const burstFlake = new Flake();
+                        burstFlake.x = Math.random() * canvas.width;
+                        burstFlake.y = canvas.height + 20;
+                        burstFlake.speed = Math.random() * -6 - 3; // Upward velocity vectors
+                        burstFlake.velX = Math.random() * 4 - 2;
+                        burstFlake.size = Math.random() * 4 + 2;
+                        flakes.push(burstFlake);
+                    }, i * 30);
+                }
+            }
+
+
+            // --- 9. TERMINAL HEARTFELT EMOTIONAL TYPEWRITER ---
+            const deepLetterString = "“Seeing you reach 2.49K subscribers makes me genuinely proud. Your hard work, dedication, and positivity inspire so many people every day. This is only the beginning of something even bigger. Keep shining, keep streaming, and keep making people smile. No matter how far you go, always remember that your journey matters and your supporters believe in you. Congratulations once again — you truly deserve all this love and success.”";
+            
+            let typewriterTriggered = false;
+            const targetElement = document.getElementById("typedTarget");
+            const finalTag = document.getElementById("finalClosingTag");
+
+            function startEmotionalTypewriter() {
+                if (typewriterTriggered) return;
+                typewriterTriggered = true;
+
+                let index = 0;
+                targetElement.innerHTML = "";
+                
+                function printNextCharacter() {
+                    if(index < deepLetterString.length) {
+                        targetElement.innerHTML += deepLetterString.charAt(index);
+                        index++;
+                        // Natural human tracking cadence variances built in
+                        let adaptiveInterval = deepLetterString.charAt(index-1) === '.' ? 450 : 25;
+                        setTimeout(printNextCharacter, adaptiveInterval);
+                    } else {
+                        // Display the final verification accent marker clearly once text sequence settles
+                        finalTag.classList.add("active-reveal");
+                    }
+                }
+                printNextCharacter();
             }
         });
-
-        /* --------------------------------------------------------- */
-        /* DYNAMIC INTERACTIVE EXPLOSION LAUNCH TRIGGERS            */
-        /* --------------------------------------------------------- */
-        function triggerConfettiBurst() {
-            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#ffb7da', '#b39ddb', '#ffe082'] });
-        }
-
-        function triggerHeartBurst() {
-            const defaults = { spread: 360, ticks: 50, gravity: 0, decay: 0.94, startVelocity: 30, colors: ['#ffb7da', '#ff4a4a'] };
-            confetti({ ...defaults, particleCount: 40, scalar: 1.2 });
-        }
-
-        function triggerMultiFireworks() {
-            let duration = 3 * 1000;
-            let end = Date.now() + duration;
-
-            (function frame() {
-                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 } });
-                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 } });
-                if (Date.now() < end) { requestAnimationFrame(frame); }
-            }());
-        }
-
-        /* --------------------------------------------------------- */
-        /* CINEMATIC SLIDESHOW COMPONENT ENGINE LOOP                  */
-        /* --------------------------------------------------------- */
-        function initCinematicSlideshowLoop() {
-            const slides = document.querySelectorAll('.slide');
-            let currentSlide = 0;
-
-            setInterval(() => {
-                slides[currentSlide].classList.remove('active');
-                currentSlide = (currentSlide + 1) % slides.length;
-                slides[currentSlide].classList.add('active');
-            }, 4000);
-        }
-
-        /* --------------------------------------------------------- */
-        /* GRAND FINALE CAKE TRANSITION EXPERIENCE CLIMAX RITUAL     */
-        /* --------------------------------------------------------- */
-        let climaxTriggered = false;
-        function igniteCakeClimax() {
-            // Trigger intense systemic particles bursts instantly
-            triggerMultiFireworks();
-            triggerConfettiBurst();
-            
-            // Extinguish structural cake fire indicators safely
-            document.getElementById('cake-flame').style.display = 'none';
-            
-            if(!climaxTriggered) {
-                climaxTriggered = true;
-                
-                // Enhance synthesizer audio parameters rapidly to signal celebration peaks
-                if(audioCtx && gainNode) {
-                    gainNode.gain.setValueAtTime(0.08, audioCtx.currentTime);
-                    oscillator.frequency.setValueAtTime(440, audioCtx.currentTime); // Pitch up to pristine A4 root tones
-                }
-                
-                const cta = document.getElementById('cut-cake-cta');
-                cta.innerText = "Enjoy Your Special Day! ✨";
-                cta.style.background = "linear-gradient(135deg, #ffd700 0%, #ffa500 100%)";
-                
-                alert("🎉 Penglow, your cake has been cut! Wishing you an absolutely unforgettable birthday full of love, happiness, and high subscriber numbers! - Your Close Friend ❤️");
-            }
-        }
     </script>
 </body>
 </html>
